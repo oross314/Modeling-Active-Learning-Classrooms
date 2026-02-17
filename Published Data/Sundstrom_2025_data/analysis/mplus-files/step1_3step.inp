@@ -1,0 +1,20 @@
+TITLE:
+M1: Class4 
+DATA:
+FILE = "step1_3step.dat"; 
+VARIABLE:
+NAMES = CQ MG PQ Lec CG WG OG SQ Study Method Course; 
+ MISSING=.;
+ usevar = CQ-SQ;
+classes = c(4); 
+ANALYSIS:
+estimator = mlr; 
+    type = mixture;
+    starts = 200 50; 
+    processors = 10;
+    optseed = 565819;
+SAVEDATA:
+!!! This saved dataset will contain class probabilities and modal assignment columns !!!
+    File=3step_savedata.dat;
+    Save=cprob;
+    Missflag= 999;

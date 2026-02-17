@@ -1,0 +1,1461 @@
+Mplus VERSION 8.11 (Mac)
+MUTHEN & MUTHEN
+03/26/2025   2:42 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  M4: Class6
+  DATA:
+  FILE = "/Users/MeaganSundstrom_1/Desktop/CALEP_Analysis_Github/m4_enum/
+  c_lpa_m4.dat";
+  VARIABLE:
+  NAMES = CQ MG PQ Lec CG WG OG SQ Study Method Course;
+   MISSING=.;
+   usevar = CQ-SQ;
+  classes = c(6);
+  ANALYSIS:
+  estimator = mlr;
+      type = mixture;
+      starts = 200 50;
+      processors = 10;
+  MODEL:
+  %c#1%
+      [CQ-SQ];          !!! means are freely estimated
+      CQ-SQ;       !!! variances are fixed to equality
+      CG with WG;       !!! covariances are freely estimated
+      CG with OG;
+      CG with SQ;
+      CG with Lec;
+      CG with PQ;
+      CG with CQ;
+      CG with MG;
+      WG with OG;
+      WG with SQ;
+      WG with Lec;
+      WG with PQ;
+      WG with CQ;
+      WG with MG;
+      OG with SQ;
+      OG with Lec;
+      OG with PQ;
+      OG with CQ;
+      OG with MG;
+      SQ with Lec;
+      SQ with PQ;
+      SQ with CQ;
+      SQ with MG;
+      Lec with PQ;
+      Lec with CQ;
+      Lec with MG;
+      PQ with CQ;
+      PQ with MG;
+      CQ with MG;
+
+   %c#2%
+   [CQ-SQ];
+   CQ-SQ;
+   CG with WG;
+   CG with OG;
+   CG with SQ;
+   CG with Lec;
+   CG with PQ;
+   CG with CQ;
+   CG with MG;
+   WG with OG;
+   WG with SQ;
+   WG with Lec;
+   WG with PQ;
+   WG with CQ;
+   WG with MG;
+   OG with SQ;
+   OG with Lec;
+   OG with PQ;
+   OG with CQ;
+   OG with MG;
+   SQ with Lec;
+   SQ with PQ;
+   SQ with CQ;
+   SQ with MG;
+   Lec with PQ;
+   Lec with CQ;
+   Lec with MG;
+   PQ with CQ;
+   PQ with MG;
+   CQ with MG;
+
+   %c#3%
+   [CQ-SQ];
+   CQ-SQ;
+   CG with WG;
+   CG with OG;
+   CG with SQ;
+   CG with Lec;
+   CG with PQ;
+   CG with CQ;
+   CG with MG;
+   WG with OG;
+   WG with SQ;
+   WG with Lec;
+   WG with PQ;
+   WG with CQ;
+   WG with MG;
+   OG with SQ;
+   OG with Lec;
+   OG with PQ;
+   OG with CQ;
+   OG with MG;
+   SQ with Lec;
+   SQ with PQ;
+   SQ with CQ;
+   SQ with MG;
+   Lec with PQ;
+   Lec with CQ;
+   Lec with MG;
+   PQ with CQ;
+   PQ with MG;
+   CQ with MG;
+
+   %c#3%
+   [CQ-SQ];
+   CQ-SQ;
+   CG with WG;
+   CG with OG;
+   CG with SQ;
+   CG with Lec;
+   CG with PQ;
+   CG with CQ;
+   CG with MG;
+   WG with OG;
+   WG with SQ;
+   WG with Lec;
+   WG with PQ;
+   WG with CQ;
+   WG with MG;
+   OG with SQ;
+   OG with Lec;
+   OG with PQ;
+   OG with CQ;
+   OG with MG;
+   SQ with Lec;
+   SQ with PQ;
+   SQ with CQ;
+   SQ with MG;
+   Lec with PQ;
+   Lec with CQ;
+   Lec with MG;
+   PQ with CQ;
+   PQ with MG;
+   CQ with MG;
+
+   %c#3%
+   [CQ-SQ];
+   CQ-SQ;
+   CG with WG;
+   CG with OG;
+   CG with SQ;
+   CG with Lec;
+   CG with PQ;
+   CG with CQ;
+   CG with MG;
+   WG with OG;
+   WG with SQ;
+   WG with Lec;
+   WG with PQ;
+   WG with CQ;
+   WG with MG;
+   OG with SQ;
+   OG with Lec;
+   OG with PQ;
+   OG with CQ;
+   OG with MG;
+   SQ with Lec;
+   SQ with PQ;
+   SQ with CQ;
+   SQ with MG;
+   Lec with PQ;
+   Lec with CQ;
+   Lec with MG;
+   PQ with CQ;
+   PQ with MG;
+   CQ with MG;
+
+   %c#3%
+   [CQ-SQ];
+   CQ-SQ;
+   CG with WG;
+   CG with OG;
+   CG with SQ;
+   CG with Lec;
+   CG with PQ;
+   CG with CQ;
+   CG with MG;
+   WG with OG;
+   WG with SQ;
+   WG with Lec;
+   WG with PQ;
+   WG with CQ;
+   WG with MG;
+   OG with SQ;
+   OG with Lec;
+   OG with PQ;
+   OG with CQ;
+   OG with MG;
+   SQ with Lec;
+   SQ with PQ;
+   SQ with CQ;
+   SQ with MG;
+   Lec with PQ;
+   Lec with CQ;
+   Lec with MG;
+   PQ with CQ;
+   PQ with MG;
+   CQ with MG;
+  OUTPUT:
+  sampstat residual tech11 tech14;
+  PLOT:
+  type = plot3;
+       series = CQ-SQ(*);
+
+
+
+*** WARNING in MODEL command
+  All variables are uncorrelated with all other variables within class.
+  Check that this is what is intended.
+   1 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+M4: Class6
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         223
+
+Number of dependent variables                                    8
+Number of independent variables                                  0
+Number of continuous latent variables                            0
+Number of categorical latent variables                           1
+
+Observed dependent variables
+
+  Continuous
+   CQ          MG          PQ          LEC         CG          WG
+   OG          SQ
+
+Categorical latent variables
+   C
+
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Optimization Specifications for the Quasi-Newton Algorithm for
+Continuous Outcomes
+  Maximum number of iterations                                 100
+  Convergence criterion                                  0.100D-05
+Optimization Specifications for the EM Algorithm
+  Maximum number of iterations                                 500
+  Convergence criteria
+    Loglikelihood change                                 0.100D-06
+    Relative loglikelihood change                        0.100D-06
+    Derivative                                           0.100D-05
+Optimization Specifications for the M step of the EM Algorithm for
+Categorical Latent variables
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-05
+  Basis for M step termination                           ITERATION
+Optimization Specifications for the M step of the EM Algorithm for
+Censored, Binary or Ordered Categorical (Ordinal), Unordered
+Categorical (Nominal) and Count Outcomes
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-05
+  Basis for M step termination                           ITERATION
+  Maximum value for logit thresholds                            15
+  Minimum value for logit thresholds                           -15
+  Minimum expected cell size for chi-square              0.100D-01
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Optimization algorithm                                         EMA
+Random Starts Specifications
+  Number of initial stage random starts                        200
+  Number of final stage optimizations                           50
+  Number of initial stage iterations                            10
+  Initial stage convergence criterion                    0.100D+01
+  Random starts scale                                    0.500D+01
+  Random seed for generating random starts                       0
+
+Input data file(s)
+  /Users/MeaganSundstrom_1/Desktop/CALEP_Analysis_Github/m4_enum/c_lpa_m4.dat
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             1
+     Number of y missing data patterns           1
+     Number of u missing data patterns           0
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT FOR Y
+
+
+           Covariance Coverage
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             1.000
+ MG             1.000         1.000
+ PQ             1.000         1.000         1.000
+ LEC            1.000         1.000         1.000         1.000
+ CG             1.000         1.000         1.000         1.000         1.000
+ WG             1.000         1.000         1.000         1.000         1.000
+ OG             1.000         1.000         1.000         1.000         1.000
+ SQ             1.000         1.000         1.000         1.000         1.000
+
+
+           Covariance Coverage
+              WG            OG            SQ
+              ________      ________      ________
+ WG             1.000
+ OG             1.000         1.000
+ SQ             1.000         1.000         1.000
+
+
+SAMPLE STATISTICS
+
+
+     ESTIMATED SAMPLE STATISTICS
+
+
+           Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+                0.152         0.337         0.397         0.444         0.102
+
+
+           Means
+              WG            OG            SQ
+              ________      ________      ________
+                0.233         0.138         0.141
+
+
+           Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             0.038
+ MG            -0.026         0.105
+ PQ            -0.007         0.015         0.105
+ LEC            0.021        -0.091        -0.008         0.129
+ CG             0.028        -0.015        -0.004         0.011         0.025
+ WG            -0.033         0.087        -0.009        -0.086        -0.022
+ OG            -0.013         0.023         0.012        -0.033        -0.009
+ SQ            -0.005         0.012        -0.017        -0.014        -0.004
+
+
+           Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG             0.139
+ OG            -0.020         0.066
+ SQ             0.025        -0.001         0.028
+
+
+           Correlations
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             1.000
+ MG            -0.414         1.000
+ PQ            -0.109         0.147         1.000
+ LEC            0.300        -0.778        -0.068         1.000
+ CG             0.901        -0.288        -0.083         0.190         1.000
+ WG            -0.452         0.720        -0.073        -0.643        -0.377
+ OG            -0.265         0.280         0.147        -0.355        -0.220
+ SQ            -0.149         0.217        -0.315        -0.235        -0.136
+
+
+           Correlations
+              WG            OG            SQ
+              ________      ________      ________
+ WG             1.000
+ OG            -0.211         1.000
+ SQ             0.397        -0.027         1.000
+
+
+     MAXIMUM LOG-LIKELIHOOD VALUE FOR THE UNRESTRICTED (H1) MODEL IS 483.025
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     CQ                    0.152       1.385       0.000   47.98%       0.000      0.000      0.054
+             223.000       0.038       1.763       1.000    0.45%       0.152      0.321
+     MG                    0.337       0.519       0.000   30.04%       0.000      0.121      0.269
+             223.000       0.105      -1.002       1.000    4.04%       0.435      0.630
+     PQ                    0.397       0.385       0.000   15.25%       0.048      0.227      0.314
+             223.000       0.105      -1.218       1.000    3.14%       0.429      0.767
+     LEC                   0.444       0.186       0.000   16.14%       0.043      0.250      0.400
+             223.000       0.129      -1.499       1.000    5.38%       0.571      0.849
+     CG                    0.102       1.723       0.000   56.05%       0.000      0.000      0.000
+             223.000       0.025       2.628       0.792    0.45%       0.050      0.200
+     WG                    0.233       1.216       0.000   66.37%       0.000      0.000      0.000
+             223.000       0.139      -0.227       1.000   11.66%       0.000      0.673
+     OG                    0.138       2.198       0.000   56.50%       0.000      0.000      0.000
+             223.000       0.066       3.833       1.000    0.90%       0.048      0.225
+     SQ                    0.141       1.724       0.000   24.22%       0.000      0.053      0.091
+             223.000       0.028       3.105       0.900    0.45%       0.127      0.231
+
+RANDOM STARTS RESULTS RANKED FROM THE BEST TO THE WORST LOGLIKELIHOOD VALUES
+
+
+169 perturbed starting value run(s) did not converge or were rejected in the third stage.
+Final stage loglikelihood values at local maxima, seeds, and initial stage start numbers:
+
+             965.293  118421           139
+             483.025  789985           67
+             483.025  793035           187
+             483.025  345070           114
+             483.025  645664           39
+             483.025  650371           14
+             483.025  93468            3
+             205.465  303634           169
+             197.448  479273           156
+             197.448  830392           35
+             197.448  150531           154
+             178.939  471398           74
+             178.939  25127            107
+             178.939  856536           144
+             178.939  928287           197
+            -101.474  286735           175
+            -101.474  354208           196
+            -101.474  648555           113
+
+32 perturbed starting value run(s) did not converge or were rejected in the third stage.
+
+
+
+     WARNING:  THE BEST LOGLIKELIHOOD VALUE WAS NOT REPLICATED.  THE
+     SOLUTION MAY NOT BE TRUSTWORTHY DUE TO LOCAL MAXIMA.  INCREASE THE
+     NUMBER OF RANDOM STARTS.
+
+     THE STANDARD ERRORS OF THE MODEL PARAMETER ESTIMATES MAY NOT BE
+     TRUSTWORTHY FOR SOME PARAMETERS DUE TO A NON-POSITIVE DEFINITE
+     FIRST-ORDER DERIVATIVE PRODUCT MATRIX.  THIS MAY BE DUE TO THE STARTING
+     VALUES BUT MAY ALSO BE AN INDICATION OF MODEL NONIDENTIFICATION.  THE
+     CONDITION NUMBER IS      -0.413D-17.  PROBLEM INVOLVING THE FOLLOWING PARAMETER:
+     Parameter 129, %C#3%: SQ WITH CG
+
+     ONE OR MORE PARAMETERS WERE FIXED TO AVOID SINGULARITY OF THE
+     INFORMATION MATRIX. THE SINGULARITY IS MOST LIKELY BECAUSE THE
+     MODEL IS NOT IDENTIFIED, OR BECAUSE OF EMPTY CELLS IN THE JOINT
+     DISTRIBUTION OF THE CATEGORICAL VARIABLES IN THE MODEL.
+     THE FOLLOWING PARAMETERS WERE FIXED:
+     Parameter 1, %C#1%: [ CQ ]
+     Parameter 2, %C#1%: [ MG ]
+     Parameter 3, %C#1%: [ PQ ]
+     Parameter 4, %C#1%: [ LEC ]
+     Parameter 5, %C#1%: [ CG ]
+     Parameter 6, %C#1%: [ WG ]
+     Parameter 7, %C#1%: [ OG ]
+     Parameter 8, %C#1%: [ SQ ]
+     Parameter 9, %C#1%: CQ
+     Parameter 10, %C#1%: MG WITH CQ
+     Parameter 11, %C#1%: MG
+     Parameter 12, %C#1%: PQ WITH CQ
+     Parameter 13, %C#1%: PQ WITH MG
+     Parameter 14, %C#1%: PQ
+     Parameter 15, %C#1%: LEC WITH CQ
+     Parameter 16, %C#1%: LEC WITH MG
+     Parameter 17, %C#1%: LEC WITH PQ
+     Parameter 18, %C#1%: LEC
+     Parameter 19, %C#1%: CG WITH CQ
+     Parameter 20, %C#1%: CG WITH MG
+     Parameter 21, %C#1%: CG WITH PQ
+     Parameter 22, %C#1%: CG WITH LEC
+     Parameter 23, %C#1%: CG
+     Parameter 24, %C#1%: WG WITH CQ
+     Parameter 25, %C#1%: WG WITH MG
+     Parameter 26, %C#1%: WG WITH PQ
+     Parameter 27, %C#1%: WG WITH LEC
+     Parameter 28, %C#1%: WG WITH CG
+     Parameter 29, %C#1%: WG
+     Parameter 30, %C#1%: OG WITH CQ
+     Parameter 31, %C#1%: OG WITH MG
+     Parameter 32, %C#1%: OG WITH PQ
+     Parameter 33, %C#1%: OG WITH LEC
+     Parameter 34, %C#1%: OG WITH CG
+     Parameter 35, %C#1%: OG WITH WG
+     Parameter 36, %C#1%: OG
+     Parameter 37, %C#1%: SQ WITH CQ
+     Parameter 38, %C#1%: SQ WITH MG
+     Parameter 39, %C#1%: SQ WITH PQ
+     Parameter 40, %C#1%: SQ WITH LEC
+     Parameter 41, %C#1%: SQ WITH CG
+     Parameter 42, %C#1%: SQ WITH WG
+     Parameter 43, %C#1%: SQ WITH OG
+     Parameter 44, %C#1%: SQ
+     Parameter 45, %C#2%: [ CQ ]
+     Parameter 46, %C#2%: [ MG ]
+     Parameter 47, %C#2%: [ PQ ]
+     Parameter 48, %C#2%: [ LEC ]
+     Parameter 49, %C#2%: [ CG ]
+     Parameter 50, %C#2%: [ WG ]
+     Parameter 51, %C#2%: [ OG ]
+     Parameter 52, %C#2%: [ SQ ]
+     Parameter 53, %C#2%: CQ
+     Parameter 54, %C#2%: MG WITH CQ
+     Parameter 55, %C#2%: MG
+     Parameter 56, %C#2%: PQ WITH CQ
+     Parameter 57, %C#2%: PQ WITH MG
+     Parameter 58, %C#2%: PQ
+     Parameter 59, %C#2%: LEC WITH CQ
+     Parameter 60, %C#2%: LEC WITH MG
+     Parameter 61, %C#2%: LEC WITH PQ
+     Parameter 62, %C#2%: LEC
+     Parameter 63, %C#2%: CG WITH CQ
+     Parameter 64, %C#2%: CG WITH MG
+     Parameter 65, %C#2%: CG WITH PQ
+     Parameter 66, %C#2%: CG WITH LEC
+     Parameter 67, %C#2%: CG
+     Parameter 68, %C#2%: WG WITH CQ
+     Parameter 69, %C#2%: WG WITH MG
+     Parameter 70, %C#2%: WG WITH PQ
+     Parameter 71, %C#2%: WG WITH LEC
+     Parameter 72, %C#2%: WG WITH CG
+     Parameter 73, %C#2%: WG
+     Parameter 74, %C#2%: OG WITH CQ
+     Parameter 75, %C#2%: OG WITH MG
+     Parameter 76, %C#2%: OG WITH PQ
+     Parameter 77, %C#2%: OG WITH LEC
+     Parameter 78, %C#2%: OG WITH CG
+     Parameter 79, %C#2%: OG WITH WG
+     Parameter 80, %C#2%: OG
+     Parameter 81, %C#2%: SQ WITH CQ
+     Parameter 82, %C#2%: SQ WITH MG
+     Parameter 83, %C#2%: SQ WITH PQ
+     Parameter 84, %C#2%: SQ WITH LEC
+     Parameter 85, %C#2%: SQ WITH CG
+     Parameter 86, %C#2%: SQ WITH WG
+     Parameter 87, %C#2%: SQ WITH OG
+     Parameter 88, %C#2%: SQ
+     Parameter 157, %C#6%: [ CQ ]
+     Parameter 158, %C#6%: [ MG ]
+     Parameter 159, %C#6%: [ PQ ]
+     Parameter 160, %C#6%: [ LEC ]
+     Parameter 161, %C#6%: [ CG ]
+     Parameter 162, %C#6%: [ WG ]
+     Parameter 163, %C#6%: [ OG ]
+     Parameter 164, %C#6%: [ SQ ]
+     Parameter 165, [ C#1 ]
+     Parameter 166, [ C#2 ]
+     Parameter 169, [ C#5 ]
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                      169
+
+Loglikelihood
+
+          H0 Value                         965.293
+          H0 Scaling Correction Factor      0.8012
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                   -1592.585
+          Bayesian (BIC)                 -1016.773
+          Sample-Size Adjusted BIC       -1552.356
+            (n* = (n + 2) / 24)
+
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON THE ESTIMATED MODEL
+
+    Latent
+   Classes
+
+       1          0.00000          0.00000
+       2          0.00000          0.00000
+       3        138.27148          0.62005
+       4         67.45069          0.30247
+       5         17.27783          0.07748
+       6          0.00000          0.00000
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON ESTIMATED POSTERIOR PROBABILITIES
+
+    Latent
+   Classes
+
+       1          0.00000          0.00000
+       2          0.00000          0.00000
+       3        138.27148          0.62005
+       4         67.45069          0.30247
+       5         17.27783          0.07748
+       6          0.00000          0.00000
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON THEIR MOST LIKELY LATENT CLASS MEMBERSHIP
+
+Class Counts and Proportions
+
+    Latent
+   Classes
+
+       1                0          0.00000
+       2                0          0.00000
+       3              139          0.62332
+       4               67          0.30045
+       5               17          0.07623
+       6                0          0.00000
+
+
+CLASSIFICATION QUALITY
+
+     Entropy                         0.984
+
+
+Average Latent Class Probabilities for Most Likely Latent Class Membership (Row)
+by Latent Class (Column)
+
+           1        2        3        4        5        6
+
+    1   0.000    0.000    0.000    0.000    0.000    0.000
+    2   0.000    0.000    0.000    0.000    0.000    0.000
+    3   0.000    0.000    0.995    0.005    0.000    0.000
+    4   0.000    0.000    0.000    0.988    0.012    0.000
+    5   0.000    0.000    0.000    0.032    0.968    0.000
+    6   0.000    0.000    0.000    0.000    0.000    0.000
+
+
+Classification Probabilities for the Most Likely Latent Class Membership (Column)
+by Latent Class (Row)
+
+           1        2        3        4        5        6
+
+    1   0.000    0.000    0.000    0.000    0.000    0.000
+    2   0.000    0.000    0.000    0.000    0.000    0.000
+    3   0.000    0.000    1.000    0.000    0.000    0.000
+    4   0.000    0.000    0.011    0.981    0.008    0.000
+    5   0.000    0.000    0.000    0.048    0.952    0.000
+    6   0.000    0.000    0.000    0.000    0.000    0.000
+
+
+Logits for the Classification Probabilities for the Most Likely Latent Class Membership (Column)
+by Latent Class (Row)
+
+              1        2        3        4        5        6
+
+    1      0.000    0.000    0.000    0.000    0.000    0.000
+    2      0.000    0.000    0.000    0.000    0.000    0.000
+    3      0.000    0.000   13.815    2.823    0.000    0.000
+    4      0.000    0.000    9.291   13.796    8.999    0.000
+    5      0.000    0.000    0.000   10.773   13.767    0.000
+    6      0.000    0.000    0.000    0.000    0.000    0.000
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+Latent Class 1
+
+ CG       WITH
+    WG                 0.000      0.000    999.000    999.000
+    OG                 0.000      0.000    999.000    999.000
+    SQ                 0.000      0.000    999.000    999.000
+    LEC                0.000      0.000    999.000    999.000
+    PQ                 0.000      0.000    999.000    999.000
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ WG       WITH
+    OG                 0.000      0.000    999.000    999.000
+    SQ                 0.000      0.000    999.000    999.000
+    LEC                0.000      0.000    999.000    999.000
+    PQ                 0.000      0.000    999.000    999.000
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ OG       WITH
+    SQ                 0.000      0.000    999.000    999.000
+    LEC                0.000      0.000    999.000    999.000
+    PQ                 0.000      0.000    999.000    999.000
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ SQ       WITH
+    LEC                0.000      0.000    999.000    999.000
+    PQ                 0.000      0.000    999.000    999.000
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ LEC      WITH
+    PQ                 0.000      0.000    999.000    999.000
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ PQ       WITH
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ CQ       WITH
+    MG                 0.000      0.000    999.000    999.000
+
+ Means
+    CQ                -0.924      0.000    999.000    999.000
+    MG                 1.026      0.000    999.000    999.000
+    PQ                 0.051      0.000    999.000    999.000
+    LEC               -0.265      0.000    999.000    999.000
+    CG                -0.400      0.000    999.000    999.000
+    WG                 0.471      0.000    999.000    999.000
+    OG                 0.472      0.000    999.000    999.000
+    SQ                -1.753      0.000    999.000    999.000
+
+ Variances
+    CQ                 0.019      0.000    999.000    999.000
+    MG                 0.053      0.000    999.000    999.000
+    PQ                 0.053      0.000    999.000    999.000
+    LEC                0.064      0.000    999.000    999.000
+    CG                 0.012      0.000    999.000    999.000
+    WG                 0.070      0.000    999.000    999.000
+    OG                 0.033      0.000    999.000    999.000
+    SQ                 0.014      0.000    999.000    999.000
+
+Latent Class 2
+
+ CG       WITH
+    WG                 0.000      0.000    999.000    999.000
+    OG                 0.000      0.000    999.000    999.000
+    SQ                 0.000      0.000    999.000    999.000
+    LEC                0.000      0.000    999.000    999.000
+    PQ                 0.000      0.000    999.000    999.000
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ WG       WITH
+    OG                 0.000      0.000    999.000    999.000
+    SQ                 0.000      0.000    999.000    999.000
+    LEC                0.000      0.000    999.000    999.000
+    PQ                 0.000      0.000    999.000    999.000
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ OG       WITH
+    SQ                 0.000      0.000    999.000    999.000
+    LEC                0.000      0.000    999.000    999.000
+    PQ                 0.000      0.000    999.000    999.000
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ SQ       WITH
+    LEC                0.000      0.000    999.000    999.000
+    PQ                 0.000      0.000    999.000    999.000
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ LEC      WITH
+    PQ                 0.000      0.000    999.000    999.000
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ PQ       WITH
+    CQ                 0.000      0.000    999.000    999.000
+    MG                 0.000      0.000    999.000    999.000
+
+ CQ       WITH
+    MG                 0.000      0.000    999.000    999.000
+
+ Means
+    CQ                 1.070      0.000    999.000    999.000
+    MG                -1.440      0.000    999.000    999.000
+    PQ                 0.049      0.000    999.000    999.000
+    LEC               -0.902      0.000    999.000    999.000
+    CG                -0.952      0.000    999.000    999.000
+    WG                -0.294      0.000    999.000    999.000
+    OG                 0.960      0.000    999.000    999.000
+    SQ                -0.264      0.000    999.000    999.000
+
+ Variances
+    CQ                 0.019      0.000    999.000    999.000
+    MG                 0.053      0.000    999.000    999.000
+    PQ                 0.053      0.000    999.000    999.000
+    LEC                0.064      0.000    999.000    999.000
+    CG                 0.012      0.000    999.000    999.000
+    WG                 0.070      0.000    999.000    999.000
+    OG                 0.033      0.000    999.000    999.000
+    SQ                 0.014      0.000    999.000    999.000
+
+Latent Class 3
+
+ CG       WITH
+    WG                 0.000      0.000      1.432      0.152
+    OG                -0.010      0.004     -2.839      0.005
+    SQ                 0.002      0.001      1.247      0.212
+    LEC               -0.013      0.005     -2.403      0.016
+    PQ                -0.009      0.004     -2.400      0.016
+    CQ                 0.031      0.004      6.817      0.000
+    MG                 0.004      0.005      0.803      0.422
+
+ WG       WITH
+    OG                 0.000      0.000     -1.370      0.171
+    SQ                 0.000      0.000     -1.397      0.162
+    LEC                0.000      0.000     -1.337      0.181
+    PQ                 0.000      0.000     -1.176      0.239
+    CQ                 0.000      0.000      1.432      0.152
+    MG                 0.000      0.000      1.050      0.294
+
+ OG       WITH
+    SQ                -0.004      0.002     -2.092      0.036
+    LEC               -0.036      0.011     -3.104      0.002
+    PQ                 0.031      0.010      3.020      0.003
+    CQ                -0.015      0.005     -3.036      0.002
+    MG                 0.034      0.013      2.569      0.010
+
+ SQ       WITH
+    LEC                0.003      0.003      1.071      0.284
+    PQ                 0.002      0.002      0.848      0.396
+    CQ                 0.003      0.002      1.935      0.053
+    MG                -0.006      0.002     -3.128      0.002
+
+ LEC      WITH
+    PQ                -0.031      0.009     -3.274      0.001
+    CQ                -0.011      0.007     -1.522      0.128
+    MG                -0.043      0.011     -4.042      0.000
+
+ PQ       WITH
+    CQ                -0.014      0.005     -2.984      0.003
+    MG                 0.025      0.010      2.597      0.009
+
+ CQ       WITH
+    MG                -0.001      0.006     -0.140      0.889
+
+ Means
+    CQ                 0.236      0.019     12.680      0.000
+    MG                 0.158      0.025      6.314      0.000
+    PQ                 0.412      0.025     16.246      0.000
+    LEC                0.642      0.028     22.637      0.000
+    CG                 0.158      0.015     10.206      0.000
+    WG                 0.002      0.001      1.368      0.171
+    OG                 0.115      0.025      4.614      0.000
+    SQ                 0.097      0.009     10.738      0.000
+
+ Variances
+    CQ                 0.041      0.006      6.912      0.000
+    MG                 0.051      0.012      4.357      0.000
+    PQ                 0.067      0.007      9.172      0.000
+    LEC                0.085      0.009      9.619      0.000
+    CG                 0.030      0.004      6.958      0.000
+    WG                 0.000      0.000      1.288      0.198
+    OG                 0.041      0.014      2.862      0.004
+    SQ                 0.011      0.002      6.052      0.000
+
+Latent Class 4
+
+ Means
+    CQ                 0.018      0.008      2.146      0.032
+    MG                 0.582      0.029     20.018      0.000
+    PQ                 0.454      0.053      8.588      0.000
+    LEC                0.149      0.025      6.059      0.000
+    CG                 0.013      0.006      2.071      0.038
+    WG                 0.516      0.050     10.408      0.000
+    OG                 0.208      0.049      4.275      0.000
+    SQ                 0.126      0.015      8.297      0.000
+
+ Variances
+    CQ                 0.003      0.002      1.918      0.055
+    MG                 0.047      0.008      5.997      0.000
+    PQ                 0.140      0.014     10.308      0.000
+    LEC                0.029      0.008      3.490      0.000
+    CG                 0.002      0.001      1.971      0.049
+    WG                 0.100      0.014      7.242      0.000
+    OG                 0.102      0.024      4.312      0.000
+    SQ                 0.017      0.003      5.385      0.000
+
+Latent Class 5
+
+ Means
+    CQ                 0.000      0.000      0.786      0.432
+    MG                 0.812      0.049     16.440      0.000
+    PQ                 0.048      0.046      1.032      0.302
+    LEC                0.013      0.007      1.725      0.085
+    CG                 0.000      0.000      0.784      0.433
+    WG                 0.984      0.013     78.650      0.000
+    OG                 0.058      0.058      1.003      0.316
+    SQ                 0.555      0.050     11.016      0.000
+
+ Variances
+    CQ                 0.003      0.002      1.918      0.055
+    MG                 0.047      0.008      5.997      0.000
+    PQ                 0.140      0.014     10.308      0.000
+    LEC                0.029      0.008      3.490      0.000
+    CG                 0.002      0.001      1.971      0.049
+    WG                 0.100      0.014      7.242      0.000
+    OG                 0.102      0.024      4.312      0.000
+    SQ                 0.017      0.003      5.385      0.000
+
+Latent Class 6
+
+ Means
+    CQ                -0.717      0.000    999.000    999.000
+    MG                -0.240      0.000    999.000    999.000
+    PQ                 2.348      0.000    999.000    999.000
+    LEC               -0.416      0.000    999.000    999.000
+    CG                 1.712      0.000    999.000    999.000
+    WG                 0.189      0.000    999.000    999.000
+    OG                -0.540      0.000    999.000    999.000
+    SQ                 0.574      0.000    999.000    999.000
+
+ Variances
+    CQ                 0.003      0.002      1.918      0.055
+    MG                 0.047      0.008      5.997      0.000
+    PQ                 0.140      0.014     10.308      0.000
+    LEC                0.029      0.008      3.490      0.000
+    CG                 0.002      0.001      1.971      0.049
+    WG                 0.100      0.014      7.242      0.000
+    OG                 0.102      0.024      4.312      0.000
+    SQ                 0.017      0.003      5.385      0.000
+
+Categorical Latent Variables
+
+ Means
+    C#1                0.000      0.000    999.000    999.000
+    C#2                0.000      0.000    999.000    999.000
+    C#3              638.596      0.287   2223.196      0.000
+    C#4              637.878      0.318   2005.864      0.000
+    C#5              636.516      0.000    999.000    999.000
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.273E-07
+       (ratio of smallest to largest eigenvalue)
+
+
+RESIDUAL OUTPUT
+
+
+     ESTIMATED MODEL AND RESIDUALS (OBSERVED - ESTIMATED) FOR CLASS 1
+
+
+           Model Estimated Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+               -0.924         1.026         0.051        -0.265        -0.400
+
+
+           Model Estimated Means
+              WG            OG            SQ
+              ________      ________      ________
+                0.471         0.472        -1.753
+
+
+           Residuals for Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+                1.364        -0.856        -0.031         0.725         0.730
+
+
+           Residuals for Means
+              WG            OG            SQ
+              ________      ________      ________
+               -0.331        -0.472         1.773
+
+
+           Model Estimated Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             0.019
+ MG             0.000         0.053
+ PQ             0.000         0.000         0.053
+ LEC            0.000         0.000         0.000         0.064
+ CG             0.000         0.000         0.000         0.000         0.012
+ WG             0.000         0.000         0.000         0.000         0.000
+ OG             0.000         0.000         0.000         0.000         0.000
+ SQ             0.000         0.000         0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG             0.070
+ OG             0.000         0.033
+ SQ             0.000         0.000         0.014
+
+
+           Residuals for Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ            -0.019
+ MG             0.000        -0.053
+ PQ             0.000         0.000        -0.053
+ LEC            0.000         0.000         0.000        -0.064
+ CG             0.000         0.000         0.000         0.000        -0.012
+ WG             0.000         0.000         0.000         0.000         0.000
+ OG             0.000         0.000         0.000         0.000         0.000
+ SQ             0.000         0.000         0.000         0.000         0.000
+
+
+           Residuals for Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG            -0.070
+ OG             0.000        -0.033
+ SQ             0.000         0.000        -0.014
+
+
+     ESTIMATED MODEL AND RESIDUALS (OBSERVED - ESTIMATED) FOR CLASS 2
+
+
+           Model Estimated Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+                1.070        -1.440         0.049        -0.902        -0.952
+
+
+           Model Estimated Means
+              WG            OG            SQ
+              ________      ________      ________
+               -0.294         0.960        -0.264
+
+
+           Residuals for Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+               -0.630         1.610        -0.029         1.362         1.282
+
+
+           Residuals for Means
+              WG            OG            SQ
+              ________      ________      ________
+                0.434        -0.960         0.284
+
+
+           Model Estimated Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             0.019
+ MG             0.000         0.053
+ PQ             0.000         0.000         0.053
+ LEC            0.000         0.000         0.000         0.064
+ CG             0.000         0.000         0.000         0.000         0.012
+ WG             0.000         0.000         0.000         0.000         0.000
+ OG             0.000         0.000         0.000         0.000         0.000
+ SQ             0.000         0.000         0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG             0.070
+ OG             0.000         0.033
+ SQ             0.000         0.000         0.014
+
+
+           Residuals for Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ            -0.019
+ MG             0.000        -0.053
+ PQ             0.000         0.000        -0.053
+ LEC            0.000         0.000         0.000        -0.064
+ CG             0.000         0.000         0.000         0.000        -0.012
+ WG             0.000         0.000         0.000         0.000         0.000
+ OG             0.000         0.000         0.000         0.000         0.000
+ SQ             0.000         0.000         0.000         0.000         0.000
+
+
+           Residuals for Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG            -0.070
+ OG             0.000        -0.033
+ SQ             0.000         0.000        -0.014
+
+
+     ESTIMATED MODEL AND RESIDUALS (OBSERVED - ESTIMATED) FOR CLASS 3
+
+
+           Model Estimated Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+                0.236         0.158         0.412         0.642         0.158
+
+
+           Model Estimated Means
+              WG            OG            SQ
+              ________      ________      ________
+                0.002         0.115         0.097
+
+
+           Residuals for Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           Residuals for Means
+              WG            OG            SQ
+              ________      ________      ________
+                0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             0.041
+ MG            -0.001         0.051
+ PQ            -0.014         0.025         0.067
+ LEC           -0.011        -0.043        -0.031         0.085
+ CG             0.031         0.004        -0.009        -0.013         0.030
+ WG             0.000         0.000         0.000         0.000         0.000
+ OG            -0.015         0.034         0.031        -0.036        -0.010
+ SQ             0.003        -0.006         0.002         0.003         0.002
+
+
+           Model Estimated Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG             0.000
+ OG             0.000         0.041
+ SQ             0.000        -0.004         0.011
+
+
+           Residuals for Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             0.000
+ MG             0.000         0.000
+ PQ             0.000         0.000         0.000
+ LEC            0.000         0.000         0.000         0.000
+ CG             0.000         0.000         0.000         0.000         0.000
+ WG             0.000         0.000         0.000         0.000         0.000
+ OG             0.000         0.000         0.000         0.000         0.000
+ SQ             0.000         0.000         0.000         0.000         0.000
+
+
+           Residuals for Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG             0.000
+ OG             0.000         0.000
+ SQ             0.000         0.000         0.000
+
+
+     ESTIMATED MODEL AND RESIDUALS (OBSERVED - ESTIMATED) FOR CLASS 4
+
+
+           Model Estimated Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+                0.018         0.582         0.454         0.149         0.013
+
+
+           Model Estimated Means
+              WG            OG            SQ
+              ________      ________      ________
+                0.516         0.208         0.126
+
+
+           Residuals for Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           Residuals for Means
+              WG            OG            SQ
+              ________      ________      ________
+                0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             0.003
+ MG             0.000         0.047
+ PQ             0.000         0.000         0.140
+ LEC            0.000         0.000         0.000         0.029
+ CG             0.000         0.000         0.000         0.000         0.002
+ WG             0.000         0.000         0.000         0.000         0.000
+ OG             0.000         0.000         0.000         0.000         0.000
+ SQ             0.000         0.000         0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG             0.100
+ OG             0.000         0.102
+ SQ             0.000         0.000         0.017
+
+
+           Residuals for Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             0.001
+ MG            -0.003         0.002
+ PQ            -0.002         0.035         0.027
+ LEC            0.002        -0.014         0.008         0.007
+ CG             0.003        -0.002        -0.001         0.001         0.001
+ WG            -0.003         0.041         0.030        -0.023        -0.002
+ OG            -0.002        -0.005        -0.044        -0.015        -0.002
+ SQ            -0.001        -0.009        -0.022         0.007        -0.001
+
+
+           Residuals for Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG             0.025
+ OG            -0.082         0.012
+ SQ            -0.015         0.010        -0.001
+
+
+     ESTIMATED MODEL AND RESIDUALS (OBSERVED - ESTIMATED) FOR CLASS 5
+
+
+           Model Estimated Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+                0.000         0.812         0.048         0.013         0.000
+
+
+           Model Estimated Means
+              WG            OG            SQ
+              ________      ________      ________
+                0.984         0.058         0.555
+
+
+           Residuals for Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+                0.000         0.000         0.000         0.000         0.000
+
+
+           Residuals for Means
+              WG            OG            SQ
+              ________      ________      ________
+                0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             0.003
+ MG             0.000         0.047
+ PQ             0.000         0.000         0.140
+ LEC            0.000         0.000         0.000         0.029
+ CG             0.000         0.000         0.000         0.000         0.002
+ WG             0.000         0.000         0.000         0.000         0.000
+ OG             0.000         0.000         0.000         0.000         0.000
+ SQ             0.000         0.000         0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG             0.100
+ OG             0.000         0.102
+ SQ             0.000         0.000         0.017
+
+
+           Residuals for Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ            -0.003
+ MG             0.000        -0.006
+ PQ             0.000        -0.009        -0.105
+ LEC            0.000        -0.003         0.003        -0.028
+ CG             0.000         0.000         0.000         0.000        -0.002
+ WG             0.000         0.004         0.000        -0.002         0.000
+ OG             0.000        -0.010         0.043         0.003         0.000
+ SQ             0.000        -0.011         0.005        -0.001         0.000
+
+
+           Residuals for Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG            -0.096
+ OG             0.001        -0.048
+ SQ             0.002         0.006         0.005
+
+
+     ESTIMATED MODEL AND RESIDUALS (OBSERVED - ESTIMATED) FOR CLASS 6
+
+
+           Model Estimated Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+               -0.717        -0.240         2.348        -0.416         1.712
+
+
+           Model Estimated Means
+              WG            OG            SQ
+              ________      ________      ________
+                0.189        -0.540         0.574
+
+
+           Residuals for Means
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+                1.157         0.410        -2.328         0.876        -1.382
+
+
+           Residuals for Means
+              WG            OG            SQ
+              ________      ________      ________
+               -0.049         0.540        -0.554
+
+
+           Model Estimated Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ             0.003
+ MG             0.000         0.047
+ PQ             0.000         0.000         0.140
+ LEC            0.000         0.000         0.000         0.029
+ CG             0.000         0.000         0.000         0.000         0.002
+ WG             0.000         0.000         0.000         0.000         0.000
+ OG             0.000         0.000         0.000         0.000         0.000
+ SQ             0.000         0.000         0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG             0.100
+ OG             0.000         0.102
+ SQ             0.000         0.000         0.017
+
+
+           Residuals for Covariances
+              CQ            MG            PQ            LEC           CG
+              ________      ________      ________      ________      ________
+ CQ            -0.003
+ MG             0.000        -0.047
+ PQ             0.000         0.000        -0.140
+ LEC            0.000         0.000         0.000        -0.029
+ CG             0.000         0.000         0.000         0.000        -0.002
+ WG             0.000         0.000         0.000         0.000         0.000
+ OG             0.000         0.000         0.000         0.000         0.000
+ SQ             0.000         0.000         0.000         0.000         0.000
+
+
+           Residuals for Covariances
+              WG            OG            SQ
+              ________      ________      ________
+ WG            -0.100
+ OG             0.000        -0.102
+ SQ             0.000         0.000        -0.017
+
+
+TECHNICAL 11 OUTPUT
+
+     Random Starts Specifications for the k-1 Class Analysis Model
+        Number of initial stage random starts                 200
+        Number of final stage optimizations                    50
+
+
+
+     VUONG-LO-MENDELL-RUBIN LIKELIHOOD RATIO TEST FOR 5 (H0) VERSUS 6 CLASSES
+
+
+
+     WARNING:  THE LIKELIHOOD RATIO TEST COMPUTATION FOR TECH11 DID NOT
+     TERMINATE NORMALLY BECAUSE THE LOGLIKELIHOOD VALUE FOR THE MODEL WITH ONE
+     LESS CLASS IS LARGER THAN THE LOGLIKELIHOOD VALUE FOR THE ESTIMATED MODEL.
+     USING MORE RANDOM STARTS MAY RESOLVE THE PROBLEM.
+
+          H0 Loglikelihood Value                         1162.660
+          2 Times the Loglikelihood Difference           -394.734
+          Difference in the Number of Parameters               98
+          Mean                                  *****************
+          Standard Deviation                    *****************
+          P-Value                                          0.2398
+
+     LO-MENDELL-RUBIN ADJUSTED LRT TEST
+
+          Value                                          -393.990
+          P-Value                                          0.2398
+
+
+TECHNICAL 14 OUTPUT
+
+     Random Starts Specifications for the k-1 Class Analysis Model
+        Number of initial stage random starts                 200
+        Number of final stage optimizations                    50
+
+     Random Starts Specification for the k-1 Class Model for Generated Data
+        Number of initial stage random starts                   0
+        Number of final stage optimizations for the
+           initial stage random starts                          0
+     Random Starts Specification for the k Class Model for Generated Data
+        Number of initial stage random starts                  40
+        Number of final stage optimizations                     8
+     Number of bootstrap draws requested                   Varies
+
+
+     PARAMETRIC BOOTSTRAPPED LIKELIHOOD RATIO TEST FOR 5 (H0) VERSUS 6 CLASSES
+
+
+
+     WARNING:  THE LIKELIHOOD RATIO TEST COMPUTATION FOR TECH14 DID NOT
+     TERMINATE NORMALLY BECAUSE THE LOGLIKELIHOOD VALUE FOR THE MODEL WITH ONE
+     LESS CLASS IS LARGER THAN THE LOGLIKELIHOOD VALUE FOR THE ESTIMATED MODEL.
+     INCREASE THE NUMBER OF RANDOM STARTS USING THE LRTSTARTS OPTION.
+
+          H0 Loglikelihood Value                         1162.660
+          2 Times the Loglikelihood Difference           -394.734
+          Difference in the Number of Parameters               98
+          Approximate P-Value                              1.0000
+          Successful Bootstrap Draws                            0
+
+
+PLOT INFORMATION
+
+The following plots are available:
+
+  Histograms (sample values)
+  Scatterplots (sample values)
+  Sample means
+  Estimated means, medians, modes, and percentiles
+  Sample and estimated means
+  Observed individual values
+  Estimated means and observed individual values
+  Estimated overall and class-specific distributions
+
+     Beginning Time:  14:42:06
+        Ending Time:  14:42:21
+       Elapsed Time:  00:00:15
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2024 Muthen & Muthen

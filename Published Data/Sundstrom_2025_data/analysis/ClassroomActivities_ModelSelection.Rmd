@@ -1,0 +1,913 @@
+---
+title: "ClassroomActivities_ModelSelection"
+author: "Meagan Sundstrom"
+date: "2025-03-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Load packages
+```{r, eval=TRUE}
+library(tidyverse)
+library(glue)
+library(MplusAutomation)
+library(here)
+library(gt)
+library(tidyLPA)
+library(patchwork)
+library(dplyr)
+library(ggpubr)
+library(effsize)
+library(metafor)
+```
+
+
+Read in data 
+```{r, eval=TRUE}
+combined<-read.csv("LPA_Input.csv")
+```
+
+Descriptive statistics
+```{r}
+combined %>% 
+  pivot_longer(CQ:SQ, names_to = "variable") %>% 
+  group_by(variable) %>% 
+  summarise(mean = mean(value, na.rm = TRUE),
+            sd = sd(value, na.rm = TRUE)) 
+```
+
+________________________________________________________________________
+
+## `model 1`: Equal variances (fixed) & covariances fixed to zero
+
+
+```{r, eval=FALSE}
+# Before running, create a folder in the project directory called "m1_enum"
+
+lpa_m1  <- lapply(1:6, function(k) { 
+  z2 <- if_else(k < 2 , '!' , '')
+  z3 <- if_else(k < 3 , '!' , '')
+  z4 <- if_else(k < 4 , '!' , '')
+  z5 <- if_else(k < 5 , '!' , '')
+  z6 <- if_else(k < 6 , '!' , '')
+  
+lpa_enum  <- mplusObject(
+      
+  TITLE = glue("M1: Class{k} "), 
+  
+  VARIABLE = glue(
+   "usevar = CQ-SQ;
+    classes = c({k}); "),
+  
+  ANALYSIS = 
+   "estimator = mlr; 
+    type = mixture;
+    starts = 200 50; 
+    processors = 10;",
+  
+  MODEL = glue(
+    "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     !!!          Syntax replicates default Mplus specification            !!!
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+     %c#1%
+     [CQ-SQ];     !!! means are are freely estimated  (default)
+     CQ-SQ(1-8);  !!! variances are fixed to equality (default)
+                              !!! covariances are fixed to zero   (default)
+{z2} %c#2%
+{z2} [CQ-SQ];
+{z2} CQ-SQ(1-8);
+     
+{z3} %c#3%
+{z3} [CQ-SQ];
+{z3} CQ-SQ(1-8);
+     
+{z4} %c#4%
+{z4} [CQ-SQ];
+{z4} CQ-SQ(1-8);
+
+{z5} %c#5%
+{z5} [CQ-SQ];
+{z5} CQ-SQ(1-8);
+
+{z6} %c#6%
+{z6} [CQ-SQ];
+{z6} CQ-SQ(1-8);"),
+  
+  OUTPUT = "sampstat residual tech11 tech14;",
+  
+  PLOT = 
+    "type = plot3; 
+     series = CQ-SQ(*);",
+  
+  usevariables = colnames(combined),
+  rdata = combined)
+
+lpa_m1_fit <- mplusModeler(lpa_enum, 
+    dataout=glue(here("m1_enum", "c_lpa_m1.dat")),
+    modelout=glue(here("m1_enum", "c{k}_lpa_m1.inp")),
+    check=TRUE, run = TRUE, hashfilename = FALSE)
+})
+
+```
+
+________________________________________________________________________
+
+Model 1: Produce model fit table
+```{r}
+m1_output <- readModels(here("m1_enum"), quiet = TRUE)
+
+m1_enum <- LatexSummaryTable(m1_output,                               
+                keepCols=c("Title","Parameters", "LL", "BIC",         
+                           "aBIC", "BLRT_PValue", "T11_VLMR_PValue",
+                           "Observations"),    
+                sortBy = "Title")                                     
+
+gt(m1_enum)
+```
+
+________________________________________________________________________
+
+## `model 2`: Free variances & covariances fixed to zero
+
+
+```{r, eval=FALSE}
+# Before running, create a folder in the project directory called "m2_enum"
+
+lpa_m2  <- lapply(1:6, function(k) { 
+  z2 <- if_else(k < 2 , '!' , '')
+  z3 <- if_else(k < 3 , '!' , '')
+  z4 <- if_else(k < 4 , '!' , '')
+  z5 <- if_else(k < 5 , '!' , '')
+  z6 <- if_else(k < 6 , '!' , '')
+  
+lpa_enum  <- mplusObject(
+      
+  TITLE = glue("M2: Class{k} "), 
+  
+  VARIABLE = glue(
+   "usevar = CQ-SQ;
+    classes = c({k}); "),
+  
+  ANALYSIS = 
+   "estimator = mlr; 
+    type = mixture;
+    starts = 200 50; 
+    processors = 10;",
+  
+  MODEL = glue(
+   
+   "%c#1%
+    [CQ-SQ];   !!! means are are freely estimated
+    CQ-SQ;     !!! variances are freely estimated
+                           !!! covariances are fixed to zero (default)
+{z2} %c#2%
+{z2} [CQ-SQ];
+{z2} CQ-SQ;
+     
+{z3} %c#3%
+{z3} [CQ-SQ];
+{z3} CQ-SQ;
+     
+{z4} %c#4%
+{z4} [CQ-SQ];
+{z4} CQ-SQ;
+
+{z5} %c#5%
+{z5} [CQ-SQ];
+{z5} CQ-SQ;
+
+{z6} %c#6%
+{z6} [CQ-SQ];
+{z6} CQ-SQ;
+
+"),
+  
+  OUTPUT = "sampstat residual tech11 tech14;",
+  
+  PLOT = 
+    "type = plot3; 
+     series = CQ-SQ(*);",
+  
+  usevariables = colnames(combined),
+  rdata = combined)
+
+lpa_m2_fit <- mplusModeler(lpa_enum, 
+    dataout=glue(here("m2_enum", "c_lpa_m2.dat")),
+    modelout=glue(here("m2_enum", "c{k}_lpa_m2.inp")) ,
+    check=TRUE, run = TRUE, hashfilename = FALSE)
+})
+
+```
+
+________________________________________________________________________
+
+Model 2: Produce model fit table
+```{r}
+m2_output <- readModels(here("m2_enum"), quiet = TRUE)
+
+m2_enum <- LatexSummaryTable(m2_output,                               
+                keepCols=c("Title","Parameters", "LL", "BIC",         
+                           "aBIC", "BLRT_PValue", "T11_VLMR_PValue",
+                           "Observations"),     
+                sortBy = "Title")                                     
+
+gt(m2_enum)
+```
+
+________________________________________________________________________
+
+## `model 3`: Equal (fixed) variances & free covariances 
+
+```{r, eval=FALSE}
+# Before running, create a folder in the project directory called "m3_enum"
+
+lpa_m3  <- lapply(1:6, function(k) { 
+  z2 <- if_else(k < 2 , '!' , '')
+  z3 <- if_else(k < 3 , '!' , '')
+  z4 <- if_else(k < 4 , '!' , '')
+  z5 <- if_else(k < 5 , '!' , '')
+  z6 <- if_else(k < 6 , '!' , '')
+  
+lpa_enum  <- mplusObject(
+      
+  TITLE = glue("M3: Class{k} "), 
+  
+  VARIABLE = glue(
+   "usevar = CQ-SQ;
+    classes = c({k}); "),
+  
+  ANALYSIS = 
+   "estimator = mlr; 
+    type = mixture;
+    starts = 200 50; 
+    processors = 10;",
+  
+  MODEL = glue(
+    
+   "%c#1%
+    [CQ-SQ];          !!! means are freely estimated
+    CQ-SQ(1-8);       !!! variances are fixed to equality
+    CG with WG;       !!! covariances are freely estimated
+    CG with OG;
+    CG with SQ;
+    CG with Lec;
+    CG with PQ;
+    CG with CQ;
+    CG with MG;
+    WG with OG;
+    WG with SQ;
+    WG with Lec;
+    WG with PQ;
+    WG with CQ;
+    WG with MG;
+    OG with SQ;
+    OG with Lec;
+    OG with PQ;
+    OG with CQ;
+    OG with MG;
+    SQ with Lec;
+    SQ with PQ;
+    SQ with CQ;
+    SQ with MG;
+    Lec with PQ;
+    Lec with CQ;
+    Lec with MG;
+    PQ with CQ;
+    PQ with MG;
+    CQ with MG;
+   
+{z2} %c#2%
+{z2} [CQ-SQ];
+{z2} CQ-SQ(1-8);
+{z2} CG with WG;       
+{z2} CG with OG;
+{z2} CG with SQ;
+{z2} CG with Lec;
+{z2} CG with PQ;
+{z2} CG with CQ;
+{z2} CG with MG;
+{z2} WG with OG;
+{z2} WG with SQ;
+{z2} WG with Lec;
+{z2} WG with PQ;
+{z2} WG with CQ;
+{z2} WG with MG;
+{z2} OG with SQ;
+{z2} OG with Lec;
+{z2} OG with PQ;
+{z2} OG with CQ;
+{z2} OG with MG;
+{z2} SQ with Lec;
+{z2} SQ with PQ;
+{z2} SQ with CQ;
+{z2} SQ with MG;
+{z2} Lec with PQ;
+{z2} Lec with CQ;
+{z2} Lec with MG;
+{z2} PQ with CQ;
+{z2} PQ with MG;
+{z2} CQ with MG;
+     
+{z3} %c#3%
+{z3} [CQ-SQ];
+{z3} CQ-SQ(1-8);
+{z3} CG with WG;       
+{z3} CG with OG;
+{z3} CG with SQ;
+{z3} CG with Lec;
+{z3} CG with PQ;
+{z3} CG with CQ;
+{z3} CG with MG;
+{z3} WG with OG;
+{z3} WG with SQ;
+{z3} WG with Lec;
+{z3} WG with PQ;
+{z3} WG with CQ;
+{z3} WG with MG;
+{z3} OG with SQ;
+{z3} OG with Lec;
+{z3} OG with PQ;
+{z3} OG with CQ;
+{z3} OG with MG;
+{z3} SQ with Lec;
+{z3} SQ with PQ;
+{z3} SQ with CQ;
+{z3} SQ with MG;
+{z3} Lec with PQ;
+{z3} Lec with CQ;
+{z3} Lec with MG;
+{z3} PQ with CQ;
+{z3} PQ with MG;
+{z3} CQ with MG;
+
+{z4} %c#3%
+{z4} [CQ-SQ];
+{z4} CQ-SQ(1-8);
+{z4} CG with WG;       
+{z4} CG with OG;
+{z4} CG with SQ;
+{z4} CG with Lec;
+{z4} CG with PQ;
+{z4} CG with CQ;
+{z4} CG with MG;
+{z4} WG with OG;
+{z4} WG with SQ;
+{z4} WG with Lec;
+{z4} WG with PQ;
+{z4} WG with CQ;
+{z4} WG with MG;
+{z4} OG with SQ;
+{z4} OG with Lec;
+{z4} OG with PQ;
+{z4} OG with CQ;
+{z4} OG with MG;
+{z4} SQ with Lec;
+{z4} SQ with PQ;
+{z4} SQ with CQ;
+{z4} SQ with MG;
+{z4} Lec with PQ;
+{z4} Lec with CQ;
+{z4} Lec with MG;
+{z4} PQ with CQ;
+{z4} PQ with MG;
+{z4} CQ with MG;
+
+{z5} %c#3%
+{z5} [CQ-SQ];
+{z5} CQ-SQ(1-8);
+{z5} CG with WG;       
+{z5} CG with OG;
+{z5} CG with SQ;
+{z5} CG with Lec;
+{z5} CG with PQ;
+{z5} CG with CQ;
+{z5} CG with MG;
+{z5} WG with OG;
+{z5} WG with SQ;
+{z5} WG with Lec;
+{z5} WG with PQ;
+{z5} WG with CQ;
+{z5} WG with MG;
+{z5} OG with SQ;
+{z5} OG with Lec;
+{z5} OG with PQ;
+{z5} OG with CQ;
+{z5} OG with MG;
+{z5} SQ with Lec;
+{z5} SQ with PQ;
+{z5} SQ with CQ;
+{z5} SQ with MG;
+{z5} Lec with PQ;
+{z5} Lec with CQ;
+{z5} Lec with MG;
+{z5} PQ with CQ;
+{z5} PQ with MG;
+{z5} CQ with MG;
+
+{z6} %c#3%
+{z6} [CQ-SQ];
+{z6} CQ-SQ(1-8);
+{z6} CG with WG;       
+{z6} CG with OG;
+{z6} CG with SQ;
+{z6} CG with Lec;
+{z6} CG with PQ;
+{z6} CG with CQ;
+{z6} CG with MG;
+{z6} WG with OG;
+{z6} WG with SQ;
+{z6} WG with Lec;
+{z6} WG with PQ;
+{z6} WG with CQ;
+{z6} WG with MG;
+{z6} OG with SQ;
+{z6} OG with Lec;
+{z6} OG with PQ;
+{z6} OG with CQ;
+{z6} OG with MG;
+{z6} SQ with Lec;
+{z6} SQ with PQ;
+{z6} SQ with CQ;
+{z6} SQ with MG;
+{z6} Lec with PQ;
+{z6} Lec with CQ;
+{z6} Lec with MG;
+{z6} PQ with CQ;
+{z6} PQ with MG;
+{z6} CQ with MG;"),
+  
+  OUTPUT = "sampstat residual tech11 tech14;",
+  
+  PLOT = 
+    "type = plot3; 
+     series = CQ-SQ(*);",
+  
+  usevariables = colnames(combined),
+  rdata = combined)
+
+lpa_m3_fit <- mplusModeler(lpa_enum, 
+    dataout=glue(here("m3_enum", "c_lpa_m3.dat")),
+    modelout=glue(here("m3_enum", "c{k}_lpa_m3.inp")),
+    check=TRUE, run = TRUE, hashfilename = FALSE)
+})
+
+```
+
+________________________________________________________________________
+
+Model 3: Produce model fit table
+```{r}
+m3_output <- readModels(here("m3_enum"), quiet = TRUE)
+
+m3_enum <- LatexSummaryTable(m3_output,                                   
+                keepCols=c("Title","Parameters", "LL", "BIC",             
+                           "aBIC", "BLRT_PValue", "T11_VLMR_PValue",
+                           "Observations"),    
+                sortBy = "Title")                                         
+
+gt(m3_enum)
+```
+
+________________________________________________________________________
+## `model 4`: Free variances & free covariances 
+
+```{r, eval=FALSE}
+# Before running, create a folder in the project directory called "m4_enum"
+
+lpa_m4  <- lapply(1:6, function(k) { 
+  z2 <- if_else(k < 2 , '!' , '')
+  z3 <- if_else(k < 3 , '!' , '')
+  z4 <- if_else(k < 4 , '!' , '')
+  z5 <- if_else(k < 5 , '!' , '')
+  z6 <- if_else(k < 6 , '!' , '')
+  
+lpa_enum  <- mplusObject(
+      
+  TITLE = glue("M4: Class{k} "), 
+  
+  VARIABLE = glue(
+   "usevar = CQ-SQ;
+    classes = c({k}); "),
+  
+  ANALYSIS = 
+   "estimator = mlr; 
+    type = mixture;
+    starts = 200 50; 
+    processors = 10;",
+  
+  MODEL = glue(
+    
+   "%c#1%
+    [CQ-SQ];          !!! means are freely estimated
+    CQ-SQ;       !!! variances are fixed to equality
+    CG with WG;       !!! covariances are freely estimated
+    CG with OG;
+    CG with SQ;
+    CG with Lec;
+    CG with PQ;
+    CG with CQ;
+    CG with MG;
+    WG with OG;
+    WG with SQ;
+    WG with Lec;
+    WG with PQ;
+    WG with CQ;
+    WG with MG;
+    OG with SQ;
+    OG with Lec;
+    OG with PQ;
+    OG with CQ;
+    OG with MG;
+    SQ with Lec;
+    SQ with PQ;
+    SQ with CQ;
+    SQ with MG;
+    Lec with PQ;
+    Lec with CQ;
+    Lec with MG;
+    PQ with CQ;
+    PQ with MG;
+    CQ with MG;
+   
+{z2} %c#2%
+{z2} [CQ-SQ];
+{z2} CQ-SQ;
+{z2} CG with WG;       
+{z2} CG with OG;
+{z2} CG with SQ;
+{z2} CG with Lec;
+{z2} CG with PQ;
+{z2} CG with CQ;
+{z2} CG with MG;
+{z2} WG with OG;
+{z2} WG with SQ;
+{z2} WG with Lec;
+{z2} WG with PQ;
+{z2} WG with CQ;
+{z2} WG with MG;
+{z2} OG with SQ;
+{z2} OG with Lec;
+{z2} OG with PQ;
+{z2} OG with CQ;
+{z2} OG with MG;
+{z2} SQ with Lec;
+{z2} SQ with PQ;
+{z2} SQ with CQ;
+{z2} SQ with MG;
+{z2} Lec with PQ;
+{z2} Lec with CQ;
+{z2} Lec with MG;
+{z2} PQ with CQ;
+{z2} PQ with MG;
+{z2} CQ with MG;
+
+{z3} %c#3%
+{z3} [CQ-SQ];
+{z3} CQ-SQ;
+{z3} CG with WG;       
+{z3} CG with OG;
+{z3} CG with SQ;
+{z3} CG with Lec;
+{z3} CG with PQ;
+{z3} CG with CQ;
+{z3} CG with MG;
+{z3} WG with OG;
+{z3} WG with SQ;
+{z3} WG with Lec;
+{z3} WG with PQ;
+{z3} WG with CQ;
+{z3} WG with MG;
+{z3} OG with SQ;
+{z3} OG with Lec;
+{z3} OG with PQ;
+{z3} OG with CQ;
+{z3} OG with MG;
+{z3} SQ with Lec;
+{z3} SQ with PQ;
+{z3} SQ with CQ;
+{z3} SQ with MG;
+{z3} Lec with PQ;
+{z3} Lec with CQ;
+{z3} Lec with MG;
+{z3} PQ with CQ;
+{z3} PQ with MG;
+{z3} CQ with MG;
+
+{z4} %c#3%
+{z4} [CQ-SQ];
+{z4} CQ-SQ;
+{z4} CG with WG;       
+{z4} CG with OG;
+{z4} CG with SQ;
+{z4} CG with Lec;
+{z4} CG with PQ;
+{z4} CG with CQ;
+{z4} CG with MG;
+{z4} WG with OG;
+{z4} WG with SQ;
+{z4} WG with Lec;
+{z4} WG with PQ;
+{z4} WG with CQ;
+{z4} WG with MG;
+{z4} OG with SQ;
+{z4} OG with Lec;
+{z4} OG with PQ;
+{z4} OG with CQ;
+{z4} OG with MG;
+{z4} SQ with Lec;
+{z4} SQ with PQ;
+{z4} SQ with CQ;
+{z4} SQ with MG;
+{z4} Lec with PQ;
+{z4} Lec with CQ;
+{z4} Lec with MG;
+{z4} PQ with CQ;
+{z4} PQ with MG;
+{z4} CQ with MG;
+
+{z5} %c#3%
+{z5} [CQ-SQ];
+{z5} CQ-SQ;
+{z5} CG with WG;       
+{z5} CG with OG;
+{z5} CG with SQ;
+{z5} CG with Lec;
+{z5} CG with PQ;
+{z5} CG with CQ;
+{z5} CG with MG;
+{z5} WG with OG;
+{z5} WG with SQ;
+{z5} WG with Lec;
+{z5} WG with PQ;
+{z5} WG with CQ;
+{z5} WG with MG;
+{z5} OG with SQ;
+{z5} OG with Lec;
+{z5} OG with PQ;
+{z5} OG with CQ;
+{z5} OG with MG;
+{z5} SQ with Lec;
+{z5} SQ with PQ;
+{z5} SQ with CQ;
+{z5} SQ with MG;
+{z5} Lec with PQ;
+{z5} Lec with CQ;
+{z5} Lec with MG;
+{z5} PQ with CQ;
+{z5} PQ with MG;
+{z5} CQ with MG;
+
+{z6} %c#3%
+{z6} [CQ-SQ];
+{z6} CQ-SQ;
+{z6} CG with WG;       
+{z6} CG with OG;
+{z6} CG with SQ;
+{z6} CG with Lec;
+{z6} CG with PQ;
+{z6} CG with CQ;
+{z6} CG with MG;
+{z6} WG with OG;
+{z6} WG with SQ;
+{z6} WG with Lec;
+{z6} WG with PQ;
+{z6} WG with CQ;
+{z6} WG with MG;
+{z6} OG with SQ;
+{z6} OG with Lec;
+{z6} OG with PQ;
+{z6} OG with CQ;
+{z6} OG with MG;
+{z6} SQ with Lec;
+{z6} SQ with PQ;
+{z6} SQ with CQ;
+{z6} SQ with MG;
+{z6} Lec with PQ;
+{z6} Lec with CQ;
+{z6} Lec with MG;
+{z6} PQ with CQ;
+{z6} PQ with MG;
+{z6} CQ with MG;"),
+  
+  OUTPUT = "sampstat residual tech11 tech14;",
+  
+  PLOT = 
+    "type = plot3; 
+     series = CQ-SQ(*);",
+  
+  usevariables = colnames(combined),
+  rdata = combined)
+
+lpa_m4_fit <- mplusModeler(lpa_enum, 
+    dataout=glue(here("m4_enum", "c_lpa_m4.dat")),
+    modelout=glue(here("m4_enum", "c{k}_lpa_m4.inp")),
+    check=TRUE, run = TRUE, hashfilename = FALSE)
+})
+
+```
+
+________________________________________________________________________
+
+Model 4: Produce model fit table
+
+```{r}
+m4_output <- readModels(here("m4_enum"), quiet = TRUE)
+
+m4_enum <- LatexSummaryTable(m4_output,                                 
+                keepCols=c("Title","Parameters", "LL", "BIC",           
+                           "aBIC", "BLRT_PValue", "T11_VLMR_PValue",    
+                           "Observations"),                             
+                sortBy = "Title")                                       
+
+gt(m4_enum)
+```
+
+________________________________________________________________________
+
+## Final table of model fit (`all models`) 
+
+```{r, eval=TRUE}
+
+allFit <- rbind(m1_enum,m2_enum,m3_enum,m4_enum)
+                   
+allFit1 <- allFit %>% 
+  mutate(aBIC = -2*LL+Parameters*log((Observations+2)/24)) %>% 
+  mutate(CAIC = -2*LL+Parameters*(log(Observations)+1)) %>% 
+  mutate(AWE = -2*LL+2*Parameters*(log(Observations)+1.5)) %>%
+  mutate(SIC = -.5*BIC) %>% 
+  mutate(expSIC = exp(SIC - max(SIC))) %>% 
+  mutate(BF = exp(SIC-lead(SIC))) %>% 
+  mutate(cmPk = expSIC/sum(expSIC)) %>% 
+  dplyr::select(1:5,9:10,6:7,13,14) 
+
+```
+
+Format the model fit table 
+```{r, eval=TRUE}
+
+allFit1 %>% 
+  mutate(Title = str_remove_all(Title, "M...")) %>% 
+  gt() %>%
+  tab_header(
+    title = md("**Model Fit Summary Table**"), subtitle = md("&nbsp;")) %>% 
+  cols_label(
+    Title = "Classes",
+    Parameters = md("Par"),
+    LL = md("*LL*"),
+    T11_VLMR_PValue = "VLMR",
+    BLRT_PValue = "BLRT",
+    BF = md("BF"),
+    cmPk = md("*cmPk*")) %>%
+  tab_footnote(
+    footnote = md(
+    "*Note.* Par = Parameters; *LL* = model log likelihood;
+      BIC = Bayesian information criterion;
+      aBIC = sample size adjusted BIC; CAIC = consistent Akaike information criterion;
+      AWE = approximate weight of evidence criterion;
+      BLRT = bootstrapped likelihood ratio test p-value;
+      VLMR = Vuong-Lo-Mendell-Rubin adjusted likelihood ratio test p-value;
+      *cmPk* = approximate correct model probability."), 
+    locations = cells_title()) %>% 
+  tab_options(column_labels.font.weight = "bold") %>% 
+  fmt_number(10,decimals = 2,
+             drop_trailing_zeros=TRUE,
+             suffixing = TRUE) %>% 
+  fmt_number(c(3:9,11), 
+             decimals = 2) %>% 
+  sub_missing(1:11,
+              missing_text = "--") %>% 
+  fmt(c(8:9,11),
+    fns = function(x) 
+    ifelse(x<0.001, "<.001",
+           scales::number(x, accuracy = 0.01))) %>%
+  fmt(10, fns = function(x) 
+    ifelse(x>100, ">100",
+           scales::number(x, accuracy = .1))) %>%
+  tab_row_group(
+    label = "Model-1",
+    rows = 1:6) %>%
+  tab_row_group(
+    label = "Model-2",
+    rows = 7:12) %>%
+  tab_row_group(
+    label = "Model-3",
+    rows = 13:18) %>%
+  tab_row_group(
+    label = "Model-4",
+    rows = 19:24) %>%
+  row_group_order(
+      groups = c("Model-1","Model-2","Model-3","Model-4")) %>% 
+tab_style(style = list(cell_text(weight = "bold")),
+  locations = list(
+  cells_body(columns = BIC, row = BIC == min(BIC[c(1:6)])),
+  cells_body(columns = BIC, row = BIC == min(BIC[c(7:12)])),
+  cells_body(columns = BIC, row = BIC == min(BIC[c(13:18)])),
+  cells_body(columns = BIC, row = BIC == min(BIC[c(19:24)])),
+  cells_body(columns = aBIC, row = aBIC == min(aBIC[c(1:6)])),
+  cells_body(columns = aBIC, row = aBIC == min(aBIC[c(7:12)])),
+  cells_body(columns = aBIC, row = aBIC == min(aBIC[c(13:18)])),
+  cells_body(columns = aBIC, row = aBIC == min(aBIC[c(19:24)])),
+  cells_body(columns = CAIC, row = CAIC == min(CAIC[c(1:6)])),
+  cells_body(columns = CAIC, row = CAIC == min(CAIC[c(7:12)])),
+  cells_body(columns = CAIC, row = CAIC == min(CAIC[c(13:18)])),
+  cells_body(columns = CAIC, row = CAIC == min(CAIC[c(19:24)])),
+  cells_body(columns = AWE, row = AWE == min(AWE[c(1:6)])),
+  cells_body(columns = AWE, row = AWE == min(AWE[c(7:12)])),
+  cells_body(columns = AWE, row = AWE == min(AWE[c(13:18)])),
+  cells_body(columns = AWE, row = AWE == min(AWE[c(19:24)])),
+  cells_body(columns = cmPk, row =  cmPk > .001),
+  cells_body(columns = BF, row =  BF > 10),
+  cells_body(columns =  T11_VLMR_PValue,
+  row =ifelse(T11_VLMR_PValue < .001 & lead(T11_VLMR_PValue) > .001, T11_VLMR_PValue < .001, NA)),
+  cells_body(columns =  BLRT_PValue,
+  row =ifelse(BLRT_PValue < .001 & lead(BLRT_PValue) > .001, BLRT_PValue < .001, NA))))
+
+```
+
+
+________________________________________________________________________
+
+**Plot information criteria:**
+
+```{r}
+allFit1 %>%
+  dplyr::select(1, 4:7) %>%
+  rowid_to_column() %>%
+  pivot_longer(`BIC`:`AWE`,
+               names_to = "Index",
+               values_to = "ic_value") %>% 
+  separate(Title, c('Model', 'Class'), sep = ": Class")  %>% 
+  mutate(Class = as.numeric(Class)) %>%
+  mutate(Index = factor(Index,
+                        levels = c ("AWE", "CAIC", "BIC", "aBIC"))) %>%
+  ggplot(aes(x = Class, y = ic_value,
+    color = Index, shape = Index, group = Index, lty = Index)) +
+  facet_wrap(~Model,nrow=1) +
+  geom_point(size = 2.0) + geom_line(size = .8) +
+  scale_x_continuous(breaks = 1:nrow(allFit)) +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),axis.ticks.y = element_line(color = "black", size = 0.5),axis.ticks.x=element_line(color = "black", size = 0.5))+
+  labs(x = "Number of Profiles", y = "Information Criteria Value") +
+  theme(text = element_text(size = 10),
+    legend.text = element_text(size=10),
+    legend.key.width = unit(3, "line"), legend.title = element_blank(),
+    legend.position = "top")+
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.5))+
+  theme(strip.background = element_rect(colour='black', size=0.5),strip.text=element_text(size=10,color='black'))
+
+
+```
+
+
+```{r}
+# Assign each observation to their most probable profile for the model-1, 4-profile solution
+m_step1  <- mplusObject(
+  
+  TITLE = glue("M1: Class4 "), 
+  
+  VARIABLE = glue(
+   "usevar = CQ-SQ;
+    classes = c(4); "),
+  
+  ANALYSIS = 
+   "estimator = mlr; 
+    type = mixture;
+    starts = 200 50; 
+    processors = 10;
+    optseed = 565819;",
+  
+  SAVEDATA = 
+   "!!! This saved dataset will contain class probabilities and modal assignment columns !!!
+    File=3step_savedata.dat;
+    Save=cprob;
+    Missflag= 999;",
+  
+  usevariables = colnames(combined),
+  rdata = combined)
+
+m_step1_fit <- mplusModeler(m_step1,
+                 dataout="step1_3step.dat",
+                 modelout="step1_3step.inp" ,
+                 check=TRUE, run = TRUE, hashfilename = FALSE)
+
+logit_cprobs <- as.data.frame(m_step1_fit[["results"]]
+                                         [["class_counts"]]
+                                         [["logitProbs.mostLikely"]])
+
+savedata <- as.data.frame(m_step1_fit[["results"]]
+                                     [["savedata"]])
+
+colnames(savedata)[colnames(savedata)=="C"] <- "Profile"
+
+combined_assignment<-cbind(combined,savedata$Profile)
+
+combined_assignment <- combined_assignment %>% mutate(Profile=ifelse(combined_assignment$`savedata$Profile`==3,4,ifelse(combined_assignment$`savedata$Profile`==4,3,combined_assignment$`savedata$Profile`)))
+
+combined_assignment <- combined_assignment %>% dplyr::select(-12)
+
+```

@@ -1,0 +1,212 @@
+TITLE:
+M3: Class6 
+DATA:
+FILE = "/Users/MeaganSundstrom_1/Desktop/CALEP_Analysis_Github/m3_enum/
+c_lpa_m3.dat"; 
+VARIABLE:
+NAMES = CQ MG PQ Lec CG WG OG SQ Study Method Course; 
+ MISSING=.;
+ usevar = CQ-SQ;
+classes = c(6); 
+ANALYSIS:
+estimator = mlr; 
+    type = mixture;
+    starts = 200 50; 
+    processors = 10;
+MODEL:
+%c#1%
+    [CQ-SQ];          !!! means are freely estimated
+    CQ-SQ(1-8);       !!! variances are fixed to equality
+    CG with WG;       !!! covariances are freely estimated
+    CG with OG;
+    CG with SQ;
+    CG with Lec;
+    CG with PQ;
+    CG with CQ;
+    CG with MG;
+    WG with OG;
+    WG with SQ;
+    WG with Lec;
+    WG with PQ;
+    WG with CQ;
+    WG with MG;
+    OG with SQ;
+    OG with Lec;
+    OG with PQ;
+    OG with CQ;
+    OG with MG;
+    SQ with Lec;
+    SQ with PQ;
+    SQ with CQ;
+    SQ with MG;
+    Lec with PQ;
+    Lec with CQ;
+    Lec with MG;
+    PQ with CQ;
+    PQ with MG;
+    CQ with MG;
+   
+ %c#2%
+ [CQ-SQ];
+ CQ-SQ(1-8);
+ CG with WG;       
+ CG with OG;
+ CG with SQ;
+ CG with Lec;
+ CG with PQ;
+ CG with CQ;
+ CG with MG;
+ WG with OG;
+ WG with SQ;
+ WG with Lec;
+ WG with PQ;
+ WG with CQ;
+ WG with MG;
+ OG with SQ;
+ OG with Lec;
+ OG with PQ;
+ OG with CQ;
+ OG with MG;
+ SQ with Lec;
+ SQ with PQ;
+ SQ with CQ;
+ SQ with MG;
+ Lec with PQ;
+ Lec with CQ;
+ Lec with MG;
+ PQ with CQ;
+ PQ with MG;
+ CQ with MG;
+     
+ %c#3%
+ [CQ-SQ];
+ CQ-SQ(1-8);
+ CG with WG;       
+ CG with OG;
+ CG with SQ;
+ CG with Lec;
+ CG with PQ;
+ CG with CQ;
+ CG with MG;
+ WG with OG;
+ WG with SQ;
+ WG with Lec;
+ WG with PQ;
+ WG with CQ;
+ WG with MG;
+ OG with SQ;
+ OG with Lec;
+ OG with PQ;
+ OG with CQ;
+ OG with MG;
+ SQ with Lec;
+ SQ with PQ;
+ SQ with CQ;
+ SQ with MG;
+ Lec with PQ;
+ Lec with CQ;
+ Lec with MG;
+ PQ with CQ;
+ PQ with MG;
+ CQ with MG;
+
+ %c#3%
+ [CQ-SQ];
+ CQ-SQ(1-8);
+ CG with WG;       
+ CG with OG;
+ CG with SQ;
+ CG with Lec;
+ CG with PQ;
+ CG with CQ;
+ CG with MG;
+ WG with OG;
+ WG with SQ;
+ WG with Lec;
+ WG with PQ;
+ WG with CQ;
+ WG with MG;
+ OG with SQ;
+ OG with Lec;
+ OG with PQ;
+ OG with CQ;
+ OG with MG;
+ SQ with Lec;
+ SQ with PQ;
+ SQ with CQ;
+ SQ with MG;
+ Lec with PQ;
+ Lec with CQ;
+ Lec with MG;
+ PQ with CQ;
+ PQ with MG;
+ CQ with MG;
+
+ %c#3%
+ [CQ-SQ];
+ CQ-SQ(1-8);
+ CG with WG;       
+ CG with OG;
+ CG with SQ;
+ CG with Lec;
+ CG with PQ;
+ CG with CQ;
+ CG with MG;
+ WG with OG;
+ WG with SQ;
+ WG with Lec;
+ WG with PQ;
+ WG with CQ;
+ WG with MG;
+ OG with SQ;
+ OG with Lec;
+ OG with PQ;
+ OG with CQ;
+ OG with MG;
+ SQ with Lec;
+ SQ with PQ;
+ SQ with CQ;
+ SQ with MG;
+ Lec with PQ;
+ Lec with CQ;
+ Lec with MG;
+ PQ with CQ;
+ PQ with MG;
+ CQ with MG;
+
+ %c#3%
+ [CQ-SQ];
+ CQ-SQ(1-8);
+ CG with WG;       
+ CG with OG;
+ CG with SQ;
+ CG with Lec;
+ CG with PQ;
+ CG with CQ;
+ CG with MG;
+ WG with OG;
+ WG with SQ;
+ WG with Lec;
+ WG with PQ;
+ WG with CQ;
+ WG with MG;
+ OG with SQ;
+ OG with Lec;
+ OG with PQ;
+ OG with CQ;
+ OG with MG;
+ SQ with Lec;
+ SQ with PQ;
+ SQ with CQ;
+ SQ with MG;
+ Lec with PQ;
+ Lec with CQ;
+ Lec with MG;
+ PQ with CQ;
+ PQ with MG;
+ CQ with MG;
+OUTPUT:
+sampstat residual tech11 tech14;
+PLOT:
+type = plot3; 
+     series = CQ-SQ(*);

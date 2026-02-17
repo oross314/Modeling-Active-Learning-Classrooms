@@ -1,0 +1,68 @@
+---
+title: "ClassroomActivities_LPAResults"
+author: "Meagan Sundstrom"
+date: "2025-03-26"
+output: html_document
+---
+
+
+Load packages
+```{r, eval=TRUE}
+library(tidyverse)
+library(glue)
+library(MplusAutomation)
+library(here)
+library(gt)
+library(tidyLPA)
+library(patchwork)
+library(dplyr)
+library(ggpubr)
+library(effsize)
+library(metafor)
+```
+
+
+```{r}
+# Plot profiles for the model 1, 4-profile solution
+source("plot_lpa_function.txt")
+
+final_output <- readModels("step1_3step.out")
+plot_lpa_function(final_output)
+```
+
+
+```{r}
+
+profiles <- read.csv("LPA_Output.csv")
+profiles <- profiles[profiles$Study=="Sundstrom",]
+profiles[profiles=="PeerInstruction"]<-"Peer Instruction"
+profiles[profiles=="SCALEUP"]<-"SCALE-UP"
+profiles$Method<-factor(profiles$Method,levels=c("ISLE", "Peer Instruction","Tutorials","SCALE-UP"))
+
+profiles$Profile[profiles$Profile=="1"]<-"Lecture"
+profiles$Profile[profiles$Profile=="2"]<-"Clickers"
+profiles$Profile[profiles$Profile=="3"]<-"Worksheets"
+profiles$Profile[profiles$Profile=="4"]<-"Other Groupwork"
+profiles$Profile<-factor(profiles$Profile,levels=c("Lecture", "Clickers","Worksheets","Other Groupwork"))
+
+plot_pedagogy <- as.data.frame(table(profiles$Method,profiles$Profile))
+
+bars<-ggplot(plot_pedagogy, aes(fill=Var2, y=Freq, x=Var1)) + geom_hline(yintercept=0,color = "black")+
+    geom_bar(position="stack", stat="identity",width=0.8) +
+    theme_minimal() +
+	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),axis.ticks.y = element_line(color = "black", size = 0.5),axis.ticks.x=element_line(color = "black", size = 0.5))+
+    xlab("Active Learning Method") +
+    ylab("Number of Observations")+
+    theme(axis.title = element_text(size=8,color='black'),axis.text = element_text(size=7,color='black'),axis.text.x=element_text(angle=0))+
+  theme(legend.position = "top",legend.text=element_text(size=7,color='black',margin = margin(l = 0)),legend.title=element_text(size=7,color='black'))+scale_fill_manual(values=c("#0072b2","#d55e00","#cac14a","#007757"))+
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.5),strip.background = element_rect(colour='black', size=0.5),legend.key.size = unit(0.5, "line"))+scale_x_discrete(labels = function(x) str_wrap(x, width = 10))+theme(legend.box.margin=margin(-10,-10,-10,-10))+scale_y_continuous(breaks=c(0,5,10,15,20,25,30))+ guides(fill=guide_legend(nrow=2,byrow=TRUE,title="Profile"))
+
+bars
+
+```
+
+```{r}
+ggarrange(plot_lpa_function(final_output),bars,nrow=1,labels=c("(a)","(b)"),font.label = list(size = 9, color = "black", family = NULL,face="plain"),widths = c(3,1.5),hjust=-0.5) %>%
+  ggexport(filename = "Profile_All.pdf",width=7.5,height=3.65,units="in")
+```
+

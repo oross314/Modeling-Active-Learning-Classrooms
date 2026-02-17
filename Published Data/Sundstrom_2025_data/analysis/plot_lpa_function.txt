@@ -1,0 +1,28 @@
+plot_lpa_function <-
+  function(model_name) {
+    library(MplusAutomation)
+    library(tidyverse)
+    library(reshape2)
+    library(cowplot)
+    library(glue)
+    
+    
+    pp_plots <-      data.frame(model_name$parameters$unstandardized) %>%      mutate(LatentClass = sub("^", "Class ", LatentClass)) %>%      filter(paramHeader == "Means") %>%      filter(LatentClass != "Class Categorical.Latent.Variables") %>%      dplyr::select(est, LatentClass, param) %>%      pivot_wider(names_from = LatentClass, values_from = est) %>%      relocate(param, .after = last_col())c_size <-      as.data.frame(model_name$class_counts$modelEstimated$proportion) %>%      dplyr::rename("cs" = 1) %>%      mutate(cs = round(cs * 100, 2))    colnames(pp_plots) <-      paste0(colnames(pp_plots[, 1:ncol(pp_plots) - 1]),             glue(" ({c_size[1:ncol(pp_plots)-1,]}%)"))pp_plots_var <-      data.frame(model_name$parameters$unstandardized) %>%      mutate(LatentClass = sub("^", "Class ", LatentClass)) %>%      filter(paramHeader == "Variances") %>%      filter(LatentClass != "Class Categorical.Latent.Variables") %>%      dplyr::select(est, LatentClass, param) %>%      pivot_wider(names_from = LatentClass, values_from = est) %>%      relocate(param, .after = last_col())colnames(pp_plots_var) <-      paste0(colnames(pp_plots_var[, 1:ncol(pp_plots_var) - 1]),             glue(" ({c_size[1:ncol(pp_plots_var)-1,]}%)"))plot_var_data <- pp_plots_var %>%      dplyr::rename("param" = ncol(pp_plots)) %>%      melt(id.vars = "param") %>%      mutate(param = fct_inorder(param))    plot_data <- pp_plots %>%      dplyr::rename("param" = ncol(pp_plots)) %>%      melt(id.vars = "param") %>%      mutate(param = fct_inorder(param))plot_data <- cbind(plot_data, plot_var_data$value)plot_data <- plot_data %>% mutate(person = ifelse(plot_data$param=="CG"|plot_data$param=="WG"|plot_data$param=="OG"|plot_data$param=="SQ"|plot_data$param=="LIS"|plot_data$param=="IND"|plot_data$param=="ANQ_S"|plot_data$param=="WC"|plot_data$param=="PRD"|plot_data$param=="SP"|plot_data$param=="W_S"|plot_data$param=="O_S","Students","Instructor"))name <- str_to_title(model_name$input$title) 
+
+levels(plot_data$variable) <- c("Profile 1 (43%)","Profile 2 (17%)","Profile 3 (13%)","Profile 4 (27%)")
+
+plot_data <- plot_data %>% mutate(NEWvariable = ifelse(plot_data$variable=="Profile 3 (13%)","Other\n Groupwork\n (13%)",ifelse(plot_data$variable=="Profile 4 (27%)","Worksheets\n (27%)",ifelse(plot_data$variable=="Profile 1 (43%)","Lecture\n (43%)","Clickers\n (17%)"))))
+
+plot_data$NEWvariable <- factor(plot_data$NEWvariable,levels=c("Lecture\n (43%)","Clickers\n (17%)","Worksheets\n (27%)","Other\n Groupwork\n (13%)"))
+
+
+levels(plot_data$param) <- c("Ask Clicker", "Guide Groupwork","Pose Question","Lecture","Clicker","Worksheet","Other Groupwork","Ask Question")
+
+plot_data$param <- factor(plot_data$param,levels=c("Lecture","Ask Clicker","Pose Question","Guide Groupwork","Ask Question","Clicker","Worksheet","Other Groupwork"))
+    p<-plot_data %>%      ggplot(        aes(          x = param,          y = value,          colour = NEWvariable,          group = NEWvariable        )      ) +
+geom_hline(yintercept=0, color = "black")+      geom_point(size = 3) +      geom_errorbar(aes(ymin=value-sqrt(plot_var_data$value), ymax=value+sqrt(plot_var_data$value)), width=.2,size=0.3)+      scale_x_discrete("Activity") +      theme_minimal() +
+	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),axis.ticks.y = element_line(color = "black", size = 0.5),axis.ticks.x=element_line(color = "black", size = 0.5))+      theme(strip.background = element_rect(colour='black', size=1),strip.text=element_text(size=7,color='black'))+guides(shape =FALSE)+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.5),strip.background = element_rect(colour='black', size=0.5)) +       theme(        text = element_text(size = 7,color="black"),        legend.key.width = unit(0.5, "line"),        legend.text = element_text(size = 7,color="black",margin = margin(l = 0)),        legend.title = element_blank(),        legend.position = "none",
+	legend.spacing.y = unit(-0.2, 'cm')      )+ guides(colour=guide_legend(nrow=2,byrow=TRUE))+ylab("Mean Fraction of Class Time")+facet_grid(NEWvariable~person,scales="free_x",labeller = labeller(groupwrap = label_wrap_gen(10)))+theme(panel.spacing = unit(.15, "lines"),axis.text = element_text(size=7,color='black'),axis.title=element_text(size=8),legend.key.size = unit(0, 'lines'))+scale_y_continuous(breaks=c(0,0.5,1.0))+theme(legend.box.margin=margin(-10,-10,-10,-10))+scale_colour_manual(values=c("#0072b2","#d55e00","#cac14a","#007757"))+scale_x_discrete(labels = function(x) str_wrap(x, width = 10))+xlab("Activity")p
+print(plot_data)
+    return(p)
+  }
