@@ -42,10 +42,6 @@ def add_cross_terms(data):
     data = np.hstack((data, data[:, :1]*data[:, 1:2]* data[:, 3:4]))  # interaction term for first three features
     data = np.hstack((data, data[:, :1]*data[:, 2:3]* data[:, 3:4]))  # interaction term for first three features
     data = np.hstack((data, data[:, 1:2] * data[:, 2:3] * data[:, 3:4]))  # interaction term for second third and fourth features
-    #data = np.hstack((data, data[:, :1] * data[:, 1:2] * data[:, 2:3] * data[:, 3:4]))  # interaction term for first four features
-
-   
-
 
     data = np.hstack((data, np.ones((data.shape[0], 1))))  # add bias term
     return data
