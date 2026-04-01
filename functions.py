@@ -52,12 +52,3 @@ def aic_correction(aic, data):
     n = data.shape[0]  # number of observations
     k = data.shape[1]  # number of parameters
     return aic + (2 * k * (k + 1)) / (n - k - 1)
-
-def is_inside_hull(points, test_points):
-    hull = ConvexHull(points)
-    # For each hull inequality: A x <= b
-    A = hull.equations[:, :-1]
-    b = hull.equations[:, -1]
-    
-    # Check all inequalities for each test point
-    return np.all(A @ test_points.T + b[:, None] <= 1e-9, axis=0)
