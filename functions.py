@@ -39,11 +39,11 @@ def add_cross_terms(data):
     
 
     data = np.hstack((data, data[:, :1]*data[:, 1:2]* data[:, 2:3]))  # interaction term for first three features
+    if features >= 4:
+        data = np.hstack((data, data[:, :1]*data[:, 1:2]* data[:, 3:4]))  # interaction term for first second and fourth features
+        data = np.hstack((data, data[:, :1]*data[:, 2:3]* data[:, 3:4]))  # interaction term for first third and fourth features
+        data = np.hstack((data, data[:, 1:2] * data[:, 2:3] * data[:, 3:4]))  # interaction term for second third and fourth features
     
-    data = np.hstack((data, data[:, :1]*data[:, 1:2]* data[:, 3:4]))  
-    data = np.hstack((data, data[:, :1]*data[:, 2:3]* data[:, 3:4]))  
-    data = np.hstack((data, data[:, 1:2] * data[:, 2:3] * data[:, 3:4]))  # interaction term for second third and fourth features
-
     #######################
     if features >= 5:
         data = np.hstack((data, data[:, :1] * data[:, 1:2] * data[:, 4:5]))  # interaction term for first second and fifth features
@@ -53,7 +53,7 @@ def add_cross_terms(data):
         data = np.hstack((data, data[:, 1:2] * data[:, 3:4] * data[:, 4:5]))  # interaction term for second fourth and fifth features
         data = np.hstack((data, data[:, 2:3] * data[:, 3:4] * data[:, 4:5]))  # interaction term for third fourth and fifth features
         ########################
-        data = np.hstack((data, data[:, :4]**3))  #third order terms
+    data = np.hstack((data, data[:, :4]**3))  #third order terms
 
     
     #fourth order terms
@@ -129,3 +129,30 @@ def feature_selection(data, target, its=10000, n =1, prt = True, num_choose = 5)
     #np.save('weights/keepers.npy', keepers)
     #np.save('weights/AICs.npy', AICs)
     return keepers, AICs, good_fits
+
+def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n):
+    LOO_predictions = np.zeros((len(good_fits), bootstrap_n, data.shape[0]))
+
+    # Store LOO weights for each fit and each data point
+    LOO_weights = np.zeros((len(good_fits), bootstrap_n, data.shape[0], data.shape[1]))
+    #perform leave-one-out cross-validation for each of the best fits
+    for k in range(len(good_fits)):
+        for l in range(bootstrap_n):
+            for i in range(data.shape[0]):
+                cut_data = np.delete(data[:, keepers[good_fits][k]], i, axis=0)
+                cut_truth = np.delete(target, i, axis=0)
+                #select .85 of the remaining data for training
+                cut_data, _, cut_truth, _ = train_test_split(cut_data, cut_truth, test_size=.1)
+                regr = OLS(cut_truth, cut_data).fit()
+                params = regr.params
+                LOO_predictions[k, l, i] = data[i, keepers[good_fits][k]] @ params
+                # Store weights for this LOO fit
+                LOO_weights[k, l, i, keepers[good_fits][k]] = params
+
+    #average over feature sets
+    LOO_predictions = np.mean(LOO_predictions, axis=0)
+
+    #find mean and standard deviation of predictions for each data point across all LOO fits
+    LOO_predictions_mean = np.mean(LOO_predictions, axis=0)
+    LOO_predictions_std = np.std(LOO_predictions, axis=0)
+    return LOO_predictions_mean, LOO_predictions_std, LOO_weights
