@@ -130,7 +130,10 @@ def feature_selection(data, target, its=10000, n =1, prt = True, num_choose = 5)
     #np.save('weights/AICs.npy', AICs)
     return keepers, AICs, good_fits
 
-def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n):
+def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = False):
+
+    if leave_out is False:
+        leave_out = np.arange(data.shape[0])
     LOO_predictions = np.zeros((len(good_fits), bootstrap_n, data.shape[0]))
 
     # Store LOO weights for each fit and each data point
@@ -138,7 +141,7 @@ def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n):
     #perform leave-one-out cross-validation for each of the best fits
     for k in range(len(good_fits)):
         for l in range(bootstrap_n):
-            for i in range(data.shape[0]):
+            for i in leave_out:
                 cut_data = np.delete(data[:, keepers[good_fits][k]], i, axis=0)
                 cut_truth = np.delete(target, i, axis=0)
                 #select .85 of the remaining data for training
