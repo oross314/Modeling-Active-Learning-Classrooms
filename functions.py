@@ -71,16 +71,12 @@ def aic_correction(aic, data):
     return aic + (2 * k * (k + 1)) / (n - k - 1)
 
 
-def feature_selection(data, target, its=10000, n =1, prt = True, num_choose = 5):
+def feature_selection(data, target, its=10000, prt = True, num_choose = 10):
     
     #Establish baseline AIC with all features
-    AIC = 0
-    for i in range(10):
-        X_train, X_test, y_train, y_test = train_test_split(data, target, test_size= int(data.shape[0] * 0.05), )
-
-        regr = OLS(y_train, X_train).fit()
-        AIC += aic_correction(regr.aic, X_train)
-    true_base_AIC = AIC / 10
+    
+    regr = OLS(target, data).fit()
+    true_base_AIC = aic_correction(regr.aic, data)
 
     AICs = np.zeros(its)
     keepers = np.zeros((its, data.shape[1]), dtype=bool)
@@ -96,26 +92,15 @@ def feature_selection(data, target, its=10000, n =1, prt = True, num_choose = 5)
         i = 1
         keeping = []
         while i < pruned_data.shape[1]:
-            #initialize AIC
-            AIC = 0
-            #run regression n times with n different subsets of the training data
-            for k in range(n):
-                
-                cut_data = np.delete(pruned_data, i, axis=1)
+  
+            cut_data = np.delete(pruned_data, i, axis=1)
+            regr = OLS(target, cut_data).fit()
+            new_AIC = aic_correction(regr.aic, cut_data)
 
-                delete_set = np.random.choice(cut_data.shape[0], size=int(cut_data.shape[0] * 0.05), replace=False)
-                cut_data = np.delete(cut_data, delete_set, axis=0)
-                cut_truth = np.delete(target, delete_set, axis=0)
-                
-                regr = OLS(cut_truth, cut_data).fit()
-                AIC += aic_correction(regr.aic, cut_data)
-            #take average AIC over n runs
-            av_AIC = AIC / n
-            #if AIC improves by removing variable, permanently remove it
-            if av_AIC - 2 < base_AIC  : #changed tolerance to 2
-
+            #if AIC doesn't increase by more than 2, remove the variable and update the base AIC
+            if new_AIC - 2 < base_AIC  : #changed tolerance to 2
                 pruned_data = np.delete(pruned_data, i, axis=1)
-                base_AIC = av_AIC
+                base_AIC = new_AIC
             #otherwise keep the variable and move to the next one
             else:
                 keepers[j, shuffle[i + (data.shape[1] - pruned_data.shape[1])]] = 1
@@ -123,39 +108,38 @@ def feature_selection(data, target, its=10000, n =1, prt = True, num_choose = 5)
                 i += 1
             
         AICs[j] = base_AIC
+
         if not j % 1000 and prt:
             print(f'Iteration {j + 1} finished with AIC {base_AIC.round(2)}')
     good_fits = np.argsort(AICs)[:num_choose]
-    #np.save('weights/keepers.npy', keepers)
-    #np.save('weights/AICs.npy', AICs)
     return keepers, AICs, good_fits
 
 def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = False):
 
     if leave_out is False:
+        #if a specific set isn't specificied to do LOOs on, do all of them
         leave_out = np.arange(data.shape[0])
-    LOO_predictions = np.zeros((len(good_fits), bootstrap_n, data.shape[0]))
+    #if leave out is int make list
+    if isinstance(leave_out, int):
+        leave_out = [leave_out,]
+    LOO_predictions = np.zeros((len(good_fits), bootstrap_n, len(leave_out)))
 
     # Store LOO weights for each fit and each data point
-    LOO_weights = np.zeros((len(good_fits), bootstrap_n, data.shape[0], data.shape[1]))
+    LOO_weights = np.zeros((len(good_fits), bootstrap_n,  data.shape[1], len(leave_out),))
     #perform leave-one-out cross-validation for each of the best fits
     for k in range(len(good_fits)):
         for l in range(bootstrap_n):
-            for i in leave_out:
-                cut_data = np.delete(data[:, keepers[good_fits][k]], i, axis=0)
-                cut_truth = np.delete(target, i, axis=0)
+            for i in range(len(leave_out)):
+                cut_data = np.delete(data[:, keepers[good_fits][k]], leave_out[i], axis=0)
+                cut_truth = np.delete(target, leave_out[i], axis=0)
                 #select .85 of the remaining data for training
-                cut_data, _, cut_truth, _ = train_test_split(cut_data, cut_truth, test_size=.1)
+                cut_data, _, cut_truth, _ = train_test_split(cut_data, cut_truth, test_size=.15)
                 regr = OLS(cut_truth, cut_data).fit()
                 params = regr.params
                 LOO_predictions[k, l, i] = data[i, keepers[good_fits][k]] @ params
                 # Store weights for this LOO fit
-                LOO_weights[k, l, i, keepers[good_fits][k]] = params
+                LOO_weights[k, l, keepers[good_fits][k], i] = params
 
     #average over feature sets
-    LOO_predictions = np.mean(LOO_predictions, axis=0)
-
-    #find mean and standard deviation of predictions for each data point across all LOO fits
-    LOO_predictions_mean = np.mean(LOO_predictions, axis=0)
-    LOO_predictions_std = np.std(LOO_predictions, axis=0)
-    return LOO_predictions_mean, LOO_predictions_std, LOO_weights
+    #LOO_predictions = np.mean(LOO_predictions, axis=0)
+    return np.squeeze(LOO_predictions), np.squeeze(LOO_weights)
