@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from statsmodels.regression.linear_model import OLS
+from statsmodels.regression.linear_model import  WLS
 
 
 
@@ -71,11 +71,11 @@ def aic_correction(aic, data):
     return aic + (2 * k * (k + 1)) / (n - k - 1)
 
 
-def feature_selection(data, target, its=10000, prt = True, num_choose = 10):
+def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weights = 1.0):
     
     #Establish baseline AIC with all features
     
-    regr = OLS(target, data).fit()
+    regr = WLS(target, data, weights=weights).fit()
     true_base_AIC = aic_correction(regr.aic, data)
 
     AICs = np.zeros(its)
@@ -94,7 +94,7 @@ def feature_selection(data, target, its=10000, prt = True, num_choose = 10):
         while i < pruned_data.shape[1]:
   
             cut_data = np.delete(pruned_data, i, axis=1)
-            regr = OLS(target, cut_data).fit()
+            regr = WLS(target, cut_data, weights=weights).fit()
             new_AIC = aic_correction(regr.aic, cut_data)
 
             #if AIC doesn't increase by more than 2, remove the variable and update the base AIC
@@ -114,7 +114,7 @@ def feature_selection(data, target, its=10000, prt = True, num_choose = 10):
     good_fits = np.argsort(AICs)[:num_choose]
     return keepers, AICs, good_fits
 
-def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = False):
+def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = False, weights = 1.0):
 
     if leave_out is False:
         #if a specific set isn't specificied to do LOOs on, do all of them
@@ -132,9 +132,10 @@ def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = Fal
             for i in range(len(leave_out)):
                 cut_data = np.delete(data[:, keepers[good_fits][k]], leave_out[i], axis=0)
                 cut_truth = np.delete(target, leave_out[i], axis=0)
+                cut_weights = np.delete(weights, leave_out[i], axis=0)
                 #select .85 of the remaining data for training
-                cut_data, _, cut_truth, _ = train_test_split(cut_data, cut_truth, test_size=.15)
-                regr = OLS(cut_truth, cut_data).fit()
+                cut_data, _, cut_truth, _, cut_weights, _ = train_test_split(cut_data, cut_truth, cut_weights, test_size=.15)
+                regr = WLS(cut_truth, cut_data, weights=cut_weights).fit()
                 params = regr.params
                 LOO_predictions[k, l, i] = data[i, keepers[good_fits][k]] @ params
                 # Store weights for this LOO fit
