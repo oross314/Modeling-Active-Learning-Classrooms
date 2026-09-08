@@ -70,7 +70,7 @@ def aic_correction(aic, data):
 
 
 def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weights = False):
-    if not weights:
+    if np.all(weights == False):
         weights = np.ones(data.shape[0])
     #Establish baseline AIC with all features
     ##################################################33
@@ -115,7 +115,7 @@ def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weig
 
             #if AIC doesn't increase by more than 2, remove the variable and update the base AIC
             ################################################3
-            if new_AIC - 2 < base_AIC  : #changed tolerance to 2
+            if new_AIC  +5 < base_AIC  : #changed tolerance to 2
             #####################################################3
                 pruned_data = np.delete(pruned_data, i, axis=1)
                 base_AIC = new_AIC
