@@ -72,19 +72,9 @@ def aic_correction(aic, data):
 def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weights = False):
     if np.all(weights == False):
         weights = np.ones(data.shape[0])
-    #Establish baseline AIC with all features
-    ##################################################33
-    #AIC = 0
-    #for i in range(10):
-        #X_train, _, y_train, _, w_train, _ = train_test_split(data, target, weights, test_size= int(data.shape[0] * 0.05), )
 
-        #regr = WLS(y_train, X_train, weights=w_train).fit()
-        #AIC += aic_correction(regr.aic, X_train)
-    #true_base_AIC = AIC / 10
-############################################################
     regr = WLS(target, data, weights=weights).fit()
-    true_base_AIC = aic_correction(regr.aic, data)
-##############################
+    true_base_AIC = regr.bic
     AICs = np.zeros(its)
     keepers = np.zeros((its, data.shape[1]), dtype=bool)
     keepers[:, -1] = 1  #always keep the bias term
@@ -102,20 +92,13 @@ def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weig
 
             #remove one feature
             cut_data = np.delete(pruned_data, i, axis=1)
-            ######################################3
-            #randomly choose 1 of the data points to drop
-            #drop_idx = np.random.choice(cut_data.shape[0], size=int(cut_data.shape[0] * 0.05), replace=False)
-            #cut_data = np.delete(cut_data, drop_idx, axis=0)
-            #cut_truth = np.delete(target, drop_idx, axis=0)
-            #cut_weights = np.delete(weights, drop_idx, axis=0)
-            #regr = WLS(cut_truth, cut_data, weights=cut_weights).fit()
-            ########################################
+
             regr = WLS(target, cut_data, weights=weights).fit()
-            new_AIC = aic_correction(regr.aic, cut_data)
+            new_AIC = regr.bic
 
             #if AIC doesn't increase by more than 2, remove the variable and update the base AIC
             ################################################3
-            if new_AIC  + 2 < base_AIC  : #changed tolerance to 2
+            if new_AIC   < base_AIC  : #changed tolerance to 2
             #####################################################3
                 pruned_data = np.delete(pruned_data, i, axis=1)
                 base_AIC = new_AIC
@@ -163,3 +146,24 @@ def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = Fal
 
 
     return np.squeeze(LOO_predictions), np.squeeze(LOO_weights)
+
+def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, ):
+#create empty arrays to store weights and predictions for each bootstrap sample, each best fit, and each data point
+    feature_selection_its = int(data.shape[0]*5)
+    LOO_predictions = np.zeros(( n_fits, bootstrap_n, data.shape[0]))
+    LOO_weights = np.zeros(( n_fits, bootstrap_n, data.shape[0], data.shape[1]))
+    good_fit_AICs = np.zeros(( n_fits, data.shape[0] ))
+
+    #perform leave-one-out cross-validation for each of the best fits
+    for k in range(data.shape[0]): 
+        print(f'LOO iteration {k} of {data.shape[0]}')
+        cut_data = np.delete(data, k, axis=0)
+        cut_truth = np.delete(target, k, axis=0)
+        cut_weights = np.delete(1/ES_variance, k, axis=0)
+        keepers, AICs, good_fits = feature_selection(cut_data, cut_truth, its=feature_selection_its, prt = False, num_choose = n_fits, weights = cut_weights)
+        #print(AICs[good_fits])
+
+        good_fit_AICs[:, k] = AICs[good_fits]
+        LOO_predictions[:, :, k], LOO_weights[:, :, k, :] = bootstrap_LOO(data, target, keepers, good_fits, 
+                                                                        bootstrap_n=bootstrap_n, leave_out = k, weights = 1/ES_variance   )
+    return LOO_predictions, LOO_weights, good_fit_AICs
