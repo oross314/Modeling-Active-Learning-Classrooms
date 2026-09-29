@@ -150,9 +150,9 @@ def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = Fal
 def weighted_MAE(y_true, y_pred, sample_std):
     return np.mean( np.abs(y_true - y_pred) / sample_std)
 
-def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, ):
+def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, it_fac = 10):
 #create empty arrays to store weights and predictions for each bootstrap sample, each best fit, and each data point
-    feature_selection_its = int(data.shape[0]*10)
+    feature_selection_its = int(data.shape[0]*it_fac)
     LOO_predictions = np.zeros(( n_fits, bootstrap_n, data.shape[0]))
     LOO_weights = np.zeros(( n_fits, bootstrap_n, data.shape[0], data.shape[1]))
     good_fit_BICs = np.zeros(( n_fits, data.shape[0] ))
