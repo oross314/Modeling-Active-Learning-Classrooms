@@ -1,9 +1,9 @@
 import numpy as np
-import matplotlib.pyplot
+import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from statsmodels.regression.linear_model import  WLS
-import plt
+
 
 
 
@@ -147,9 +147,12 @@ def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = Fal
 
     return np.squeeze(LOO_predictions), np.squeeze(LOO_weights)
 
+def weighted_MAE(y_true, y_pred, sample_std):
+    return np.mean( np.abs(y_true - y_pred) / sample_std)
+
 def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, ):
 #create empty arrays to store weights and predictions for each bootstrap sample, each best fit, and each data point
-    feature_selection_its = int(data.shape[0]*5)
+    feature_selection_its = int(data.shape[0]*10)
     LOO_predictions = np.zeros(( n_fits, bootstrap_n, data.shape[0]))
     LOO_weights = np.zeros(( n_fits, bootstrap_n, data.shape[0], data.shape[1]))
     good_fit_BICs = np.zeros(( n_fits, data.shape[0] ))
@@ -173,8 +176,14 @@ def BIC_weights(BICs):
     exp_BICs = np.exp(-0.5 * (BICs - np.min(BICs)))
     return exp_BICs / np.sum(exp_BICs)
 
-    ##plotting LOO predictions with error bars representing uncertainty across different fits
-def LOO_plot(target, LOO_predictions_mean, LOO_predictions_std, threshhold = .3, measurement_uncertainty = 1):
+
+def weighted_chi2(y_true, y_pred, sample_weight=None):
+    if sample_weight is None:
+        sample_weight = np.ones_like(y_true)
+    return np.sum( (y_true - y_pred) ** 2 / sample_weight**2)
+
+
+def LOO_plot(target, LOO_predictions_mean, LOO_predictions_std, threshhold = .3, measurement_uncertainty = 1, savefile = None):
     
 
     x, y = target, LOO_predictions_mean
@@ -202,23 +211,23 @@ def LOO_plot(target, LOO_predictions_mean, LOO_predictions_std, threshhold = .3,
     else:
         measurement_uncertainty = np.ones(data.shape[0])/data.shape[0]
 
-
     plt.xlabel(f'Measured Effect Size')
     plt.ylabel(f'Predicted Effect Size')
     plt.ylim(-.5, 3.5)
     #plt.title(f'Leave-One-Out Predictions vs Target')
     #plt.legend()
-    plt.savefig('Figs/LOO.png', dpi=300)
+    if savefile:
+        plt.savefig(savefile, dpi=300)
     plt.show()
 
-    weights = 1 / measurement_uncertainty
-    weights = weights 
+   
 
     print(f'R^2: {np.corrcoef(x, y)[0, 1]**2:.3f}')
     print(f'Mean absolute error: {np.mean(np.abs(y-x)):.4f}')
-    print(f'Weighted MAE: {np.mean(np.abs(y-x) * weights):.4f}')
+    print(f'Weighted MAE: {weighted_MAE(x, y, measurement_uncertainty):.4f}')
     print('-----')
     print(f'R^2 removing predictions outside measured range: {np.corrcoef(low_x, low_y)[0, 1]**2:.3f}')
     print(f'MAE removing predictions outside measured range: {np.mean(np.abs(low_y-low_x)):.4f}')
-    print(f'Weighted MAE removing predictions outside measured range: {np.mean(np.abs(low_y-low_x) * weights[where_low_error]):.4f}')
+    print(f'Weighted MAE removing predictions outside measured range: {weighted_MAE(low_x, low_y, measurement_uncertainty[where_low_error]):.4f}')
+
 
