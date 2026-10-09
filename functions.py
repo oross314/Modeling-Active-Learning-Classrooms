@@ -69,7 +69,7 @@ def aic_correction(aic, data):
     k = data.shape[1]  # number of parameters
     return aic + (2 * k * (k + 1)) / (n - k - 1)
 
-def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weights = False):
+def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weights = False, BIC_threshold = 2.0):
     if np.all(weights == False):
         weights = np.ones(data.shape[0])
 
@@ -98,7 +98,7 @@ def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weig
 
             #if BIC doesn't increase by more than 2, remove the variable and update the base BIC
             ################################################3
-            if new_BIC   < base_BIC  : #changed tolerance to 2
+            if new_BIC  - base_BIC  < BIC_threshold: 
             #####################################################3
                 pruned_data = np.delete(pruned_data, i, axis=1)
                 base_BIC = new_BIC
@@ -150,7 +150,7 @@ def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = Fal
 def weighted_MAE(y_true, y_pred, sample_std):
     return np.mean( np.abs(y_true - y_pred) / sample_std)
 
-def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, it_fac = 10):
+def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, it_fac = 10, BIC_threshold = 2.0):
 #create empty arrays to store weights and predictions for each bootstrap sample, each best fit, and each data point
     feature_selection_its = int(data.shape[0]*it_fac)
     LOO_predictions = np.zeros(( n_fits, bootstrap_n, data.shape[0]))
@@ -164,7 +164,7 @@ def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, i
         cut_data = np.delete(data, k, axis=0)
         cut_truth = np.delete(target, k, axis=0)
         cut_weights = np.delete(1/ES_variance, k, axis=0)
-        keepers, BICs, good_fits = feature_selection(cut_data, cut_truth, its=feature_selection_its, prt = False, num_choose = n_fits, weights = cut_weights)
+        keepers, BICs, good_fits = feature_selection(cut_data, cut_truth, its=feature_selection_its, prt = False, num_choose = n_fits, weights = cut_weights, BIC_threshold = BIC_threshold)
         #print(BICs[good_fits])
 
         good_fit_BICs[:, k] = BICs[good_fits]
@@ -183,39 +183,42 @@ def weighted_chi2(y_true, y_pred, sample_weight=None):
     return np.sum( (y_true - y_pred) ** 2 / sample_weight**2)
 
 
-def LOO_plot(target, LOO_predictions_mean, LOO_predictions_std, threshhold = .3, measurement_uncertainty = 1, savefile = None):
+def LOO_plot(target, LOO_predictions_mean, LOO_predictions_std, threshhold = 0, measurement_uncertainty = 1, savefile = None, uncertainty_threshhold = 100):
     
+    if type(measurement_uncertainty) == int:
+        measurement_uncertainty = np.ones(len(target))/len(target)
+
 
     x, y = target, LOO_predictions_mean
     plt.plot([np.min(x), np.max(x)], [np.min(x), np.max(x)], 'k--', alpha=.5)
 
-    where_low_error = np.where( (y > np.min(x) - threshhold) & (y < np.max(x) + threshhold))
-    where_high_error = np.where((y < np.min(x) - threshhold) | (y > np.max(x) + threshhold))
-    low_x, low_y = x[where_low_error], y[where_low_error]
+    where_good = np.where( (y > np.min(x) - threshhold) & (y < np.max(x) + threshhold) & (LOO_predictions_std < uncertainty_threshhold))
+    where_outside = np.where((y < np.min(x) - threshhold) | (y > np.max(x) + threshhold))
+    where_high_error = np.where( (LOO_predictions_std >= uncertainty_threshhold))
+    good_x, good_y = x[where_good], y[where_good]
+    outside_x, outside_y = x[where_outside], y[where_outside]
     high_x, high_y = x[where_high_error], y[where_high_error]
 
-    m, b = np.polyfit(x, y, 1)
-    xi = np.linspace(np.min(x), np.max(x), 100)
+    plt.scatter(good_x, good_y,  color='blue', alpha=0.7, label = 'reliable')
+    plt.errorbar(good_x, good_y, yerr=LOO_predictions_std[where_good], fmt='o', color='blue', alpha=0.3)
+    plt.errorbar(good_x, good_y, xerr = measurement_uncertainty[where_good], fmt='o', color='blue', alpha=0.3)
 
+    if len(high_x) > len(outside_x):
+        plt.scatter(high_x, high_y, color='orange', alpha=0.7, label = 'high uncertainty')
+        plt.errorbar(high_x, high_y, yerr=LOO_predictions_std[where_high_error], fmt='o', color='orange', alpha=0.3)
+        plt.errorbar(high_x, high_y, xerr = measurement_uncertainty[where_high_error], fmt='o', color='orange', alpha=0.3)
 
+    if len(outside_x):
+        plt.scatter(outside_x, outside_y, color='red', alpha=0.7, label = 'outside range')
+        plt.errorbar(outside_x, outside_y, yerr=LOO_predictions_std[where_outside], fmt='o', color='red', alpha=0.3)
+        plt.errorbar(outside_x, outside_y, xerr = measurement_uncertainty[where_outside], fmt='o', color='red', alpha=0.3)
 
-    plt.scatter(low_x, low_y, label=f'Prediction uncertainty < {threshhold}', color='blue', alpha=0.7)
-    plt.errorbar(low_x, low_y, yerr=LOO_predictions_std[where_low_error], fmt='o', color='blue', alpha=0.3)
-
-    plt.scatter(high_x, high_y, label=f'Prediction uncertainty > {threshhold}', color='red', alpha=0.7)
-    plt.errorbar(high_x, high_y, yerr=LOO_predictions_std[where_high_error], fmt='o', color='red', alpha=0.3)
-
-    if type(measurement_uncertainty) != int:
-        plt.errorbar(high_x, high_y, xerr = measurement_uncertainty[where_high_error], fmt='o', color='red', alpha=0.3)
-        plt.errorbar(low_x, low_y, xerr = measurement_uncertainty[where_low_error], fmt='o', color='blue', alpha=0.3)
-    else:
-        measurement_uncertainty = np.ones(data.shape[0])/data.shape[0]
 
     plt.xlabel(f'Measured Effect Size')
     plt.ylabel(f'Predicted Effect Size')
     plt.ylim(-.5, 3.5)
     #plt.title(f'Leave-One-Out Predictions vs Target')
-    #plt.legend()
+    plt.legend()
     if savefile:
         plt.savefig(savefile, dpi=300)
     plt.show()
@@ -226,8 +229,15 @@ def LOO_plot(target, LOO_predictions_mean, LOO_predictions_std, threshhold = .3,
     print(f'Mean absolute error: {np.mean(np.abs(y-x)):.4f}')
     print(f'Weighted MAE: {weighted_MAE(x, y, measurement_uncertainty):.4f}')
     print('-----')
-    print(f'R^2 removing predictions outside measured range: {np.corrcoef(low_x, low_y)[0, 1]**2:.3f}')
-    print(f'MAE removing predictions outside measured range: {np.mean(np.abs(low_y-low_x)):.4f}')
-    print(f'Weighted MAE removing predictions outside measured range: {weighted_MAE(low_x, low_y, measurement_uncertainty[where_low_error]):.4f}')
+    if len(outside_x) > 0:
+        print(f'Removing predictions outside measured range (N = {len(x) - len(good_x)}):')
+        where_inside = np.where((y >= np.min(x)) & (y <= np.max(x)))[0]
+        inside_x, inside_y = x[where_inside], y[where_inside]
+        print(f'R^2: {np.corrcoef(inside_x, inside_y)[0, 1]**2:.3f}')
+        print(f'MAE: {np.mean(np.abs(inside_y-inside_x)):.4f}')
+        print(f'Weighted MAE: {weighted_MAE(inside_x, inside_y, measurement_uncertainty[where_inside]):.4f}')
+        print('-----')
+
+
 
 
