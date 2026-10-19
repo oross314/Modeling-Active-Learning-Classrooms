@@ -7,10 +7,12 @@ from statsmodels.regression.linear_model import  WLS
 
 
 
-def effect_size(mean1, mean2, sd1, sd2):
-    """Calculate Cohen's d effect size between two groups."""
+def effect_size(mean1, mean2, sd1, sd2, N):
+    """Calculate Hedge's g effect size between two groups."""
     pooled_sd = np.sqrt((sd1**2 + sd2**2) / 2)
-    return (mean2 - mean1) / pooled_sd
+    m = 2*N - 2
+    sample_correction = 1 - (3 / (4 * m - 1))
+    return (mean2 - mean1) / pooled_sd * sample_correction
 
 
 
