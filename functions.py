@@ -71,12 +71,17 @@ def aic_correction(aic, data):
     k = data.shape[1]  # number of parameters
     return aic + (2 * k * (k + 1)) / (n - k - 1)
 
-def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weights = False, BIC_threshold = 2.0):
+def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weights = False, BIC_threshold = 2.0, AIC = False):
     if np.all(weights == False):
         weights = np.ones(data.shape[0])
 
     regr = WLS(target, data, weights=weights).fit()
-    true_base_BIC = regr.bic
+    ############################33
+    if AIC:
+        true_base_BIC = aic_correction(regr.aic, data) #############
+    else:
+        true_base_BIC = regr.bic #############
+    ###########################
     BICs = np.zeros(its)
     keepers = np.zeros((its, data.shape[1]), dtype=bool)
     keepers[:, -1] = 1  #always keep the bias term
@@ -96,12 +101,15 @@ def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weig
             cut_data = np.delete(pruned_data, i, axis=1)
 
             regr = WLS(target, cut_data, weights=weights).fit()
-            new_BIC = regr.bic
+            ###########################3
+            if AIC:
+                new_BIC = aic_correction(regr.aic, cut_data) ############
+            else:
+                new_BIC = regr.bic ############
+            ###########################
 
             #if BIC doesn't increase by more than 2, remove the variable and update the base BIC
-            ################################################3
             if new_BIC  - base_BIC  < BIC_threshold: 
-            #####################################################3
                 pruned_data = np.delete(pruned_data, i, axis=1)
                 base_BIC = new_BIC
             #otherwise keep the variable and move to the next one
@@ -152,7 +160,7 @@ def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = Fal
 def weighted_MAE(y_true, y_pred, sample_std):
     return np.mean( np.abs(y_true - y_pred) / sample_std)
 
-def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, it_fac = 10, BIC_threshold = 2.0):
+def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, it_fac = 10, BIC_threshold = 2.0, AIC = False):
 #create empty arrays to store weights and predictions for each bootstrap sample, each best fit, and each data point
     feature_selection_its = int(data.shape[0]*it_fac)
     LOO_predictions = np.zeros(( n_fits, bootstrap_n, data.shape[0]))
@@ -166,7 +174,7 @@ def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, i
         cut_data = np.delete(data, k, axis=0)
         cut_truth = np.delete(target, k, axis=0)
         cut_weights = np.delete(1/ES_variance, k, axis=0)
-        keepers, BICs, good_fits = feature_selection(cut_data, cut_truth, its=feature_selection_its, prt = False, num_choose = n_fits, weights = cut_weights, BIC_threshold = BIC_threshold)
+        keepers, BICs, good_fits = feature_selection(cut_data, cut_truth, its=feature_selection_its, prt = False, num_choose = n_fits, weights = cut_weights, BIC_threshold = BIC_threshold, AIC = AIC)
         #print(BICs[good_fits])
 
         good_fit_BICs[:, k] = BICs[good_fits]
