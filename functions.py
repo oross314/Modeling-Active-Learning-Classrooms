@@ -71,23 +71,21 @@ def aic_correction(aic, data):
     k = data.shape[1]  # number of parameters
     return aic + (2 * k * (k + 1)) / (n - k - 1)
 
-def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weights = False, BIC_threshold = 2.0, AIC = False):
+def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weights = False, AIC_threshold = 2.0, AIC = False):
     if np.all(weights == False):
         weights = np.ones(data.shape[0])
 
     regr = WLS(target, data, weights=weights).fit()
-    ############################33
     if AIC:
-        true_base_BIC = aic_correction(regr.aic, data) #############
+        true_base_AIC = aic_correction(regr.aic, data) #############
     else:
-        true_base_BIC = regr.bic #############
-    ###########################
-    BICs = np.zeros(its)
+        true_base_AIC = regr.bic #############
+    AICs = np.zeros(its)
     keepers = np.zeros((its, data.shape[1]), dtype=bool)
     keepers[:, -1] = 1  #always keep the bias term
 
     for j in range(its):
-        base_BIC = true_base_BIC * 1
+        base_AIC = true_base_AIC * 1
         
         #randomly shuffle order of variables, skipp bias
         shuffle = np.append(np.array([data.shape[1] - 1]), np.random.permutation(data.shape[1] - 1))
@@ -103,27 +101,27 @@ def feature_selection(data, target, its=10000, prt = True, num_choose = 10, weig
             regr = WLS(target, cut_data, weights=weights).fit()
             ###########################3
             if AIC:
-                new_BIC = aic_correction(regr.aic, cut_data) ############
+                new_AIC = aic_correction(regr.aic, cut_data) ############
             else:
-                new_BIC = regr.bic ############
+                new_AIC = regr.aic ############
             ###########################
 
-            #if BIC doesn't increase by more than 2, remove the variable and update the base BIC
-            if new_BIC  - base_BIC  < BIC_threshold: 
+            #if AIC doesn't increase by more than 2, remove the variable and update the base AIC
+            if new_AIC  - base_AIC  < AIC_threshold: 
                 pruned_data = np.delete(pruned_data, i, axis=1)
-                base_BIC = new_BIC
+                base_AIC = new_AIC
             #otherwise keep the variable and move to the next one
             else:
                 keepers[j, shuffle[i + (data.shape[1] - pruned_data.shape[1])]] = 1
                 keeping.append(i + (data.shape[1] - pruned_data.shape[1]))
                 i += 1
             
-        BICs[j] = base_BIC
+        AICs[j] = base_AIC
 
         if not j % 1000 and prt:
-            print(f'Iteration {j + 1} finished with BIC {base_BIC.round(2)}')
-    good_fits = np.argsort(BICs)[:num_choose]
-    return keepers, BICs, good_fits
+            print(f'Iteration {j + 1} finished with AIC {base_AIC.round(2)}')
+    good_fits = np.argsort(AICs)[:num_choose]
+    return keepers, AICs, good_fits
 
 def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = False, weights = 1.0):
 
@@ -160,12 +158,12 @@ def bootstrap_LOO(data, target, keepers, good_fits, bootstrap_n, leave_out = Fal
 def weighted_MAE(y_true, y_pred, sample_std):
     return np.mean( np.abs(y_true - y_pred) / sample_std)
 
-def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, it_fac = 10, BIC_threshold = 2.0, AIC = False):
+def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, it_fac = 10, AIC_threshold = 2.0, AIC = False):
 #create empty arrays to store weights and predictions for each bootstrap sample, each best fit, and each data point
     feature_selection_its = int(data.shape[0]*it_fac)
     LOO_predictions = np.zeros(( n_fits, bootstrap_n, data.shape[0]))
     LOO_weights = np.zeros(( n_fits, bootstrap_n, data.shape[0], data.shape[1]))
-    good_fit_BICs = np.zeros(( n_fits, data.shape[0] ))
+    good_fit_AICs = np.zeros(( n_fits, data.shape[0] ))
 
     #perform leave-one-out cross-validation for each of the best fits
     for k in range(data.shape[0]): 
@@ -174,17 +172,16 @@ def feature_boot_LOO(data, target, ES_variance, bootstrap_n = 10, n_fits = 10, i
         cut_data = np.delete(data, k, axis=0)
         cut_truth = np.delete(target, k, axis=0)
         cut_weights = np.delete(1/ES_variance, k, axis=0)
-        keepers, BICs, good_fits = feature_selection(cut_data, cut_truth, its=feature_selection_its, prt = False, num_choose = n_fits, weights = cut_weights, BIC_threshold = BIC_threshold, AIC = AIC)
-        #print(BICs[good_fits])
+        keepers, AICs, good_fits = feature_selection(cut_data, cut_truth, its=feature_selection_its, prt = False, num_choose = n_fits, weights = cut_weights, AIC_threshold = AIC_threshold, AIC = AIC)
 
-        good_fit_BICs[:, k] = BICs[good_fits]
+        good_fit_AICs[:, k] = AICs[good_fits]
         LOO_predictions[:, :, k], LOO_weights[:, :, k, :] = bootstrap_LOO(data, target, keepers, good_fits, 
                                                                         bootstrap_n=bootstrap_n, leave_out = k, weights = 1/ES_variance   )
-    return LOO_predictions, LOO_weights, good_fit_BICs
+    return LOO_predictions, LOO_weights, good_fit_AICs
 
-def BIC_weights(BICs):
-    exp_BICs = np.exp(-0.5 * (BICs - np.min(BICs)))
-    return exp_BICs / np.sum(exp_BICs)
+def AIC_weights(AICs):
+    exp_AICs = np.exp(-0.5 * (AICs - np.min(AICs)))
+    return exp_AICs / np.sum(exp_AICs)
 
 
 def weighted_chi2(y_true, y_pred, sample_weight=None):
@@ -193,17 +190,22 @@ def weighted_chi2(y_true, y_pred, sample_weight=None):
     return np.sum( (y_true - y_pred) ** 2 / sample_weight**2)
 
 
-def LOO_plot(target, LOO_predictions_mean, LOO_predictions_std, threshhold = 0, measurement_uncertainty = 1, savefile = None, uncertainty_threshhold = 100):
+def LOO_plot(target, LOO_predictions_mean, LOO_predictions_std, threshhold = 0, measurement_uncertainty = 1, savefile = None, uncertainty_threshhold = 100, target_min = None):
     
     if type(measurement_uncertainty) == int:
         measurement_uncertainty = np.ones(len(target))/len(target)
+
+    if target_min is not None:
+        min_target = target_min
+    else:
+        min_target = np.min(target)
 
 
     x, y = target, LOO_predictions_mean
     plt.plot([np.min(x), np.max(x)], [np.min(x), np.max(x)], 'k--', alpha=.5)
 
-    where_good = np.where( (y > np.min(x) - threshhold) & (y < np.max(x) + threshhold) & (LOO_predictions_std < uncertainty_threshhold))
-    where_outside = np.where((y < np.min(x) - threshhold) | (y > np.max(x) + threshhold))
+    where_good = np.where( (y > min_target - threshhold) & (y < np.max(x) + threshhold) & (LOO_predictions_std < uncertainty_threshhold))
+    where_outside = np.where((y < min_target - threshhold) | (y > np.max(x) + threshhold))
     where_high_error = np.where( (LOO_predictions_std >= uncertainty_threshhold))
     good_x, good_y = x[where_good], y[where_good]
     outside_x, outside_y = x[where_outside], y[where_outside]
